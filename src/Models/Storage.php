@@ -71,7 +71,8 @@ class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
         
         return parent::set(((int) $key), $val);
     }
-
+    
+    /**
      * @internal
      */
     function serialize() {
