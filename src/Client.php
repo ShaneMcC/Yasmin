@@ -24,7 +24,7 @@ namespace CharlotteDunois\Yasmin;
  * @method removeListener(string $event, callable $listener)   Remove specified listener from an event. The method is from the trait - only for documentation purpose here.
  * @method removeAllListeners($event = null)                   Remove all listeners from an event (or all listeners).
  */
-class Client implements \CharlotteDunois\Events\EventEmitterInterface {
+class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializable {
     use \CharlotteDunois\Events\EventEmitterTrait;
     
     /**
@@ -301,6 +301,60 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface {
     }
     
     /**
+     * Serializes the class.
+     * @return string
+     */
+    function serialize() {
+        $vars = \get_object_vars($this);
+        
+        unset($vars['loop'], $vars['ws'], $vars['api'], $vars['timers'],
+                $vars['onceListeners'], $vars['listeners']);
+        
+        return \serialize($vars);
+    }
+    
+    /**
+     * Unserializes the class and re-registers utils. Automatically creates an event loop.
+     * @param string $vars
+     * @throws \RuntimeException
+     */
+    function unserialize($vars) {
+        \CharlotteDunois\Yasmin\Models\ClientBase::$serializeClient = $this;
+        $this->loop = \React\EventLoop\Factory::create();
+        
+        $vars = \unserialize($vars);
+        
+        foreach($vars as $name => $val) {
+            $this->$name = $val;
+        }
+        
+        if(!empty($this->options['internal.api.instance'])) {
+            if(\is_string($this->options['internal.api.instance']) && !\class_exists($this->options['internal.api.instance'], true)) {
+                throw new \RuntimeException('Custom API Manager class does not exist');
+            }
+            
+            if(!\in_array('CharlotteDunois\\Yasmin\\HTTP\\APIManager', \class_parents($this->options['internal.api.instance']))) {
+                throw new \RuntimeException('Custom API Manager does not extend Yasmin API Manager');
+            }
+            
+            if(\is_string($this->options['internal.api.instance'])) {
+                $api = $this->options['internal.api.instance'];
+                $this->api = new $api($this);
+            } else {
+                $this->api = $this->options['internal.api.instance'];
+            }
+        } else {
+            $this->api = new \CharlotteDunois\Yasmin\HTTP\APIManager($this);
+        }
+        
+        foreach($this->utils as $name) {
+            if(\method_exists($name, 'setLoop')) {
+                $name::setLoop($this->loop);
+            }
+        }
+    }
+    
+    /**
      * You don't need to know.
      * @return \CharlotteDunois\Yasmin\HTTP\APIManager
      * @internal
@@ -342,7 +396,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface {
     
     /**
      * Gets the average ping. Or NAN.
-     * @return int|double
+     * @return int|float
      */
     function getPing() {
         $cpings = \count($this->pings);
@@ -760,6 +814,41 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface {
     }
     
     /**
+     * Returns an array of classes with are registered as Util.
+     * @return string[]
+     */
+    function getUtils() {
+        return $this->utils;
+    }
+    
+    /**
+     * Registers an Util, if it has a setLoop method. All methods used need to be static.
+     * It will set the event loop through <code>setLoop</code> and on destroy will call <code>destroy</code>.
+     * @param string $name
+     */
+    function registerUtil(string $name) {
+        if(\method_exists($name, 'setLoop')) {
+            $name::setLoop($this->loop);
+            $this->utils[] = $name;
+        }
+    }
+    
+    /**
+     * Destroys an Util and calls <code>destroy</code> (requires that it is registered as such).
+     * @param string $name
+     */
+    function destroyUtil(string $name) {
+        $pos = \array_search($name, $this->utils, true);
+        if($pos !== false) {
+            if(\method_exists($name, 'destroy')) {
+                $name::destroy();
+            }
+            
+            unset($this->utils[$pos]);
+        }
+    }
+    
+    /**
      * Registers Utils which have a setLoop method.
      * @internal
      */
@@ -785,8 +874,6 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface {
         foreach($this->utils as $util) {
             if(\method_exists($util, 'destroy')) {
                 $util::destroy();
-            } elseif(\method_exists($util, 'stopTimer')) {
-                $util::stopTimer();
             }
         }
     }
