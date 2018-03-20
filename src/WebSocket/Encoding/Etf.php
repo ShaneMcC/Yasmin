@@ -54,6 +54,7 @@ class Etf implements \CharlotteDunois\Yasmin\Interfaces\WSEncodingInterface {
             throw new \InvalidArgumentException('The ETF decoder was unable to decode the data');
         }
         
+        $msg = $this->convert($msg);
         return $msg;
     }
     
@@ -80,5 +81,28 @@ class Etf implements \CharlotteDunois\Yasmin\Interfaces\WSEncodingInterface {
         $msg->addFrame($frame);
         
         return $msg;
+    }
+    
+    /**
+     * Converts all objects.
+     * @param array|object
+     * @return array|object
+     */
+    protected function convert($data) {
+        $arr = array();
+        
+        foreach($data as $key => $val) {
+            if($val instanceof \CharlotteDunois\Erlpack\ErlpackAtom) {
+                $arr[$key] = (string) $val->atom;
+            } elseif($val instanceof \CharlotteDunois\Erlpack\ErlpackObject) {
+                $arr[$key] = $val->toArray();
+            } elseif(\is_array($val) || \is_object($val)) {
+                $arr[$key] = $this->convertIDs($val);
+            } else {
+                $arr[$key] = $val;
+            }
+        }
+        
+        return (\is_object($data) ? ((object) $arr) : $arr);
     }
 }
