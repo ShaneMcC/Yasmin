@@ -17,7 +17,7 @@ class Etf implements \CharlotteDunois\Yasmin\Interfaces\WSEncodingInterface {
     protected $erlpack;
     
     function __construct() {
-        $this->erlpack = new \CharlotteDunois\Erlpack\Erlpack(true, false);
+        $this->erlpack = new \CharlotteDunois\Erlpack\Erlpack();
     }
     
     /**
