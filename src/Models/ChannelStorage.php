@@ -43,10 +43,6 @@ class ChannelStorage extends Storage {
             return $channel;
         }
         
-        if(\is_string($channel)) {
-            $channel = (int) $channel;
-        }
-        
         if($this->has($channel)) {
             return $this->get($channel);
         }

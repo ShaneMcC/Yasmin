@@ -34,10 +34,6 @@ class RoleStorage extends Storage {
             return $role;
         }
         
-        if(\is_string($role)) {
-            $role = (int) $role;
-        }
-        
         if($this->has($role)) {
             return $this->get($role);
         }

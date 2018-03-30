@@ -28,10 +28,6 @@ class PresenceStorage extends Storage {
             $presence = $presence->id;
         }
         
-        if(\is_string($presence)) {
-            $presence = (int) $presence;
-        }
-        
         if($this->has($presence)) {
             return $this->get($presence);
         }

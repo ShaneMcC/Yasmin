@@ -47,7 +47,7 @@ class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
             return false;
         }
         
-        return parent::get(((int) $key));
+        return parent::has(((int) $key));
     }
     
     /**
