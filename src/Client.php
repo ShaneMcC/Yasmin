@@ -183,7 +183,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
     protected $utils = array();
     
     /**
-     * What do you expect this to do? It makes a new Client instance. Available client options are as following (all are optional):
+     * What do you expect this to do? It makes a new Client instance. Available client options are as following (all are optional, except for token):
      *
      * <pre>
      * array(
@@ -194,6 +194,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
      *   'messageSweepInterval' => int, (interval when the message cache gets invalidated (see messageCacheLifetime), defaults to messageCacheLifetime)
      *   'shardID' => int, (shard ID, 0-indexed, always needs to be smaller than shardCount, important for sharding)
      *   'shardCount' => int, (shard count, important for sharding)
+     *   'token' => string, (the bot token, required)
      *   'userSweepInterval' => int, (interval when the user cache gets invalidated (users sharing no mutual guilds get removed), defaults to 600)
      *   'http.restTimeOffset' => int|float, (specifies how many seconds should be waited after one REST request before the next REST request should be done)
      *   'ws.compression' => string, (Enables a specific one, defaults to zlib-stream, which is currently the only available compression)
@@ -204,19 +205,24 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
      * )
      * </pre>
      *
-     * @param array                            $options  Any client options.
-     * @param \React\EventLoop\LoopInterface   $loop     You can pass an event loop to the class, or it will automatically create one (you still need to make it run yourself).
+     * @param \React\EventLoop\LoopInterface|null  $loop     You can pass an event loop to the class, or it will automatically create one (you still need to make it run yourself).
+     * @param array                                $options  Any client options.
      * @throws \Exception|\RuntimeException
      *
      * @see \CharlotteDunois\Yasmin\ClientEvents
      */
-    function __construct(array $options = array(), ?\React\EventLoop\LoopInterface $loop = null) {
+    function __construct(?\React\EventLoop\LoopInterface $loop = null, array $options = array()) {
         if(\PHP_SAPI !== 'cli') {
-            throw new \Exception('Yasmin can only be used in the CLI SAPI. Please use PHP CLI to run Yasmin.');
+            throw new \Exception('Yasmin can only be used in the PHP CLI SAPI');
+        }
+        if(\PHP_INT_SIZE < 8) {
+            throw new \Exception('Yasmin does not support 32 bit PHP');
         }
         
         if(!empty($options)) {
             $this->validateClientOptions($options);
+            $this->token = \trim($options['token']);
+            unset($options['token']);
             $this->options = \array_merge($this->options, $options);
         }
         
@@ -411,20 +417,11 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
     
     /**
      * Login into Discord. Opens a WebSocket Gateway connection. Resolves once a WebSocket connection has been successfully established (does not mean the client is ready).
-     * @param string $token  Your token.
      * @param bool   $force  Forces the client to get the gateway address from Discord.
      * @return \React\Promise\ExtendedPromiseInterface
      * @throws \RuntimeException
      */
-    function login(string $token, bool $force = false) {
-        $token = \trim($token);
-        
-        if(empty($token)) {
-            throw new \RuntimeException('Token can not be empty');
-        }
-        
-        $this->token = $token;
-        
+    function login(bool $force = false) {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($force) {
             if($this->ws === null) {
                 return $resolve();
@@ -517,7 +514,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
      *     ** )
      *
      *     *** array( // overwrite array, all required
-     *     ***   'id' => \CharlotteDunois\Yasmin\Models\User|string, (string = user ID or role name (of above role array!))
+     *     ***   'id' => \CharlotteDunois\Yasmin\Models\User|int, (int = user ID or role name (of above role array!))
      *     ***   'allow' => \CharlotteDunois\Yasmin\Models\Permissions|int,
      *     ***   'deny' => \CharlotteDunois\Yasmin\Models\Permissions|int
      *     *** )
@@ -679,12 +676,12 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
     
     /**
      * Fetches an User from the API. Resolves with an User.
-     * @param string  $userid  The User ID to fetch.
+     * @param int  $userid  The User ID to fetch.
      * @return \React\Promise\ExtendedPromiseInterface
      * @see \CharlotteDunois\Yasmin\Models\User
      */
-    function fetchUser(string $userid) {
-        return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use  ($userid) {
+    function fetchUser(int $userid) {
+        return (new \React\Promise\Promise(function (callable $resolve, $reject) use  ($userid) {
             if($this->users->has($userid)) {
                 return $resolve($this->users->get($userid));
             }
@@ -718,12 +715,12 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
     
     /**
      * Fetches a webhook from Discord. Resolves with an instance of Webhook.
-     * @param string       $id
+     * @param int       $id
      * @param string|null  $token
      * @return \React\Promise\ExtendedPromiseInterface
      * @see \CharlotteDunois\Yasmin\Models\Webhook
      */
-    function fetchWebhook(string $id, ?string $token = null) {
+    function fetchWebhook(int $id, ?string $token = null) {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($id, $token) {
             $method = (!empty($token) ? 'getWebhookToken' : 'getWebhook');
             
@@ -904,6 +901,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
             'messageSweepInterval' => 'integer|min:0',
             'shardID' => 'integer|min:0',
             'shardCount' => 'integer|min:1',
+            'token' => 'required|string|nowhitespace',
             'userSweepInterval' => 'integer|min:0',
             'http.restTimeOffset' => 'integer',
             'ws.compression' => 'string',

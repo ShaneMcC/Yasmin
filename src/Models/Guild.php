@@ -12,13 +12,13 @@ namespace CharlotteDunois\Yasmin\Models;
 /**
  * Represents a guild. It's recommended to see if a guild is available before performing operations or reading data from it.
  *
- * @property string                                                         $id                           The guild ID.
+ * @property int                                                            $id                           The guild ID.
  * @property bool                                                           $available                    Whether the guild is available.
  * @property string                                                         $name                         The guild name.
  * @property int                                                            $createdTimestamp             The timestamp when this guild was created.
  * @property string|null                                                    $icon                         The guild icon hash, or null.
  * @property string|null                                                    $splash                       The guild splash hash, or null.
- * @property string                                                         $ownerID                      The ID of the owner.
+ * @property int                                                            $ownerID                      The ID of the owner.
  * @property bool                                                           $large                        Whether the guild is considered large.
  * @property int                                                            $memberCount                  How many members the guild has.
  * @property \CharlotteDunois\Yasmin\Models\ChannelStorage                  $channels                     Holds a guild's channels, mapped by their ID.
@@ -30,16 +30,16 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property string                                                         $explicitContentFilter        The explicit content filter level of the guild. ({@see Guild::EXPLICIT_CONTENT_FILTER})
  * @property string                                                         $region                       The region the guild is located in.
  * @property string                                                         $verificationLevel            The verification level of the guild. ({@see Guild::VERIFICATION_LEVEL})
- * @property string|null                                                    $systemChannelID              The ID of the system channel, or null.
- * @property string|null                                                    $afkChannelID                 The ID of the afk channel, or null.
+ * @property int|null                                                       $systemChannelID              The ID of the system channel, or null.
+ * @property int|null                                                       $afkChannelID                 The ID of the afk channel, or null.
  * @property int|null                                                       $afkTimeout                   The time in seconds before an user is counted as "away from keyboard".
  * @property string[]                                                       $features                     An array of guild features.
  * @property string                                                         $mfaLevel                     The required MFA level for the guild. ({@see Guild::MFA_LEVEL})
  * @property string|null                                                    $applicationID                Application ID of the guild creator, if it is bot-created.
  * @property bool                                                           $embedEnabled                 Whether the guild is embeddable or not (e.g. widget).
- * @property string|null                                                    $embedChannelID               The ID of the embed channel, or null.
+ * @property int|null                                                       $embedChannelID               The ID of the embed channel, or null.
  * @property bool                                                           $widgetEnabled                Whether the guild widget is enabled or not.
- * @property string|null                                                    $widgetChannelID              The ID of the widget channel, or null.
+ * @property int|null                                                       $widgetChannelID              The ID of the widget channel, or null.
  *
  * @property \CharlotteDunois\Yasmin\Models\VoiceChannel|null               $afkChannel                   The guild's afk channel, or null.
  * @property \DateTime                                                      $createdAt                    The DateTime instance of createdTimestamp.
@@ -138,7 +138,8 @@ class Guild extends ClientBase {
     function __construct(\CharlotteDunois\Yasmin\Client $client, array $guild) {
         parent::__construct($client);
         
-        $this->client->guilds->set($guild['id'], $this);
+        $this->id = (int) $guild['id'];
+        $this->client->guilds->set($this->id, $this);
         
         $channels = $this->client->getOption('internal.storages.channels');
         $emojis = $this->client->getOption('internal.storages.emojis');
@@ -152,7 +153,6 @@ class Guild extends ClientBase {
         $this->presences = new $presences($client);
         $this->roles = new $roles($client, $this);
         
-        $this->id = $guild['id'];
         $this->available = (empty($guild['unavailable']));
         $this->createdTimestamp = (int) \CharlotteDunois\Yasmin\Utils\Snowflake::deconstruct($this->id)->timestamp;
         
@@ -229,9 +229,9 @@ class Guild extends ClientBase {
      * )
      * </pre>
      *
-     * @param \CharlotteDunois\Yasmin\Models\User|string  $user         A guild member or User instance, or the user ID.
-     * @param string                                      $accessToken  The OAuth Access Token for the given user.
-     * @param array                                       $options      Any options.
+     * @param \CharlotteDunois\Yasmin\Models\User|int   $user         A guild member or User instance, or the user ID.
+     * @param string                                    $accessToken  The OAuth Access Token for the given user.
+     * @param array                                     $options      Any options.
      * @return \React\Promise\ExtendedPromiseInterface
      */
     function addMember($user, string $accessToken, array $options = array()) {
@@ -278,9 +278,9 @@ class Guild extends ClientBase {
     
     /**
      * Bans the given user. Resolves with $this.
-     * @param \CharlotteDunois\Yasmin\Models\GuildMember|\CharlotteDunois\Yasmin\Models\User|string  $user     A guild member or User instance, or the user ID.
-     * @param int                                                                                    $days     Number of days of messages to delete (0-7).
-     * @param string                                                                                 $reason
+     * @param \CharlotteDunois\Yasmin\Models\GuildMember|\CharlotteDunois\Yasmin\Models\User|int  $user     A guild member or User instance, or the user ID.
+     * @param int                                                                                 $days     Number of days of messages to delete (0-7).
+     * @param string                                                                              $reason
      * @return \React\Promise\ExtendedPromiseInterface
      */
     function ban($user, int $days = 0, string $reason = '') {
@@ -307,12 +307,12 @@ class Guild extends ClientBase {
      *   'bitrate' => int, (only for voice channels)
      *   'userLimit' => int, (only for voice channels, 0 = unlimited)
      *   'permissionOverwrites' => \CharlotteDunois\Yasmin\Utils\Collection|array, (an array or Collection of PermissionOverwrite instances or permission overwrite arrays*)
-     *   'parent' => \CharlotteDunois\Yasmin\Models\CategoryChannel|string, (string = channel ID)
+     *   'parent' => \CharlotteDunois\Yasmin\Models\CategoryChannel|int, (int = channel ID)
      *   'nsfw' => bool (only for text channels)
      * )
      *
      *   *  array(
-     *   *      'id' => string, (an user/member or role ID)
+     *   *      'id' => int, (an user/member or role ID)
      *   *      'type' => 'member'|'role',
      *   *      'allow' => \CharlotteDunois\Yasmin\Models\Permissions|int,
      *   *      'deny' => \CharlotteDunois\Yasmin\Models\Permissions|int
@@ -463,9 +463,9 @@ class Guild extends ClientBase {
      *   'verificationLevel' => int,
      *   'explicitContentFilter' => int,
      *   'defaultMessageNotifications' => int,
-     *   'afkChannel' => string|\CharlotteDunois\Yasmin\Models\VoiceChannel|null,
+     *   'afkChannel' => string|int|\CharlotteDunois\Yasmin\Models\VoiceChannel|null,
      *   'afkTimeout' => int|null,
-     *   'systemChannel' => string|\CharlotteDunois\Yasmin\Models\TextChannel|null,
+     *   'systemChannel' => string|int|\CharlotteDunois\Yasmin\Models\TextChannel|null,
      *   'owner' => string|\CharlotteDunois\Yasmin\Models\GuildMember,
      *   'icon' => string, (file path or URL, or data)
      *   'splash' => string, (file path or URL, or data)
@@ -553,10 +553,10 @@ class Guild extends ClientBase {
      *
      * <pre>
      * array(
-     *   'before' => string|\CharlotteDunois\Yasmin\Models\AuditLogEntry, (string = Audit Log Entry ID)
-     *   'after' => string|\CharlotteDunois\Yasmin\Models\AuditLogEntry, (string = Audit Log Entry ID)
+     *   'before' => \CharlotteDunois\Yasmin\Models\AuditLogEntry|int, (int = Audit Log Entry ID)
+     *   'after' => \CharlotteDunois\Yasmin\Models\AuditLogEntry|int, (int = Audit Log Entry ID)
      *   'limit' => int,
-     *   'user' => string|\CharlotteDunois\Yasmin\Models\User,
+     *   'user' => \CharlotteDunois\Yasmin\Models\User|int, (int = User ID)
      *   'type' => string|int
      * )
      * </pre>
@@ -622,11 +622,11 @@ class Guild extends ClientBase {
     
     /**
      * Fetches a specific guild member. Resolves with an instance of GuildMember.
-     * @param string  $userid  The ID of the guild member.
+     * @param int  $userid  The ID of the guild member.
      * @return \React\Promise\ExtendedPromiseInterface
      * @see \CharlotteDunois\Yasmin\Models\GuildMember
      */
-    function fetchMember(string $userid) {
+    function fetchMember(int $userid) {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($userid) {
             if($this->members->has($userid) && ($this->members->get($userid) instanceof \CharlotteDunois\Yasmin\Models\GuildMember)) {
                 return $resolve($this->members->get($userid));
@@ -839,7 +839,7 @@ class Guild extends ClientBase {
     }
     
     /**
-     * Batch-updates the guild's roles positions. Roles is an array of <code>role ID (string)|Role => position (int)</code> pairs. Resolves with $this.
+     * Batch-updates the guild's roles positions. Roles is an array of <code>role ID (int)|Role => position (int)</code> pairs. Resolves with $this.
      * @param array   $roles
      * @param string  $reason
      * @return \React\Promise\ExtendedPromiseInterface
@@ -944,8 +944,8 @@ class Guild extends ClientBase {
     
     /**
      * Unbans the given user. Resolves with $this.
-     * @param \CharlotteDunois\Yasmin\Models\User|string  $user     An User instance or the user ID.
-     * @param string                                      $reason
+     * @param \CharlotteDunois\Yasmin\Models\User|int  $user     An User instance or the user ID.
+     * @param string                                   $reason
      * @return \React\Promise\ExtendedPromiseInterface
      */
     function unban($user, string $reason = '') {
@@ -1001,7 +1001,7 @@ class Guild extends ClientBase {
         $this->name = $guild['name'];
         $this->icon = $guild['icon'];
         $this->splash = $guild['splash'];
-        $this->ownerID = $guild['owner_id'];
+        $this->ownerID = (int) $guild['owner_id'];
         $this->large = (bool) ($guild['large'] ?? $this->large);
         $this->memberCount = $guild['member_count']  ?? $this->memberCount;
         
@@ -1009,18 +1009,18 @@ class Guild extends ClientBase {
         $this->explicitContentFilter = self::EXPLICIT_CONTENT_FILTER[$guild['explicit_content_filter']] ?? $this->explicitContentFilter;
         $this->region = $guild['region'];
         $this->verificationLevel = self::VERIFICATION_LEVEL[$guild['verification_level']] ?? $this->verificationLevel;
-        $this->systemChannelID = $guild['system_channel_id'];
+        $this->systemChannelID = (!empty($guild['system_channel_id']) ? ((int) $guild['system_channel_id']) : null);
         
-        $this->afkChannelID = $guild['afk_channel_id'];
+        $this->afkChannelID = (!empty($guild['afk_channel_id']) ? ((int) $guild['afk_channel_id']) : null);
         $this->afkTimeout = $guild['afk_timeout'];
         $this->features = $guild['features'];
         $this->mfaLevel = self::MFA_LEVEL[$guild['mfa_level']] ?? $this->mfaLevel;
         $this->applicationID = $guild['application_id'];
         
         $this->embedEnabled = (bool) ($guild['embed_enabled'] ?? $this->embedEnabled);
-        $this->embedChannelID = $guild['embed_channel_id'] ?? $this->embedChannelID;
+        $this->embedChannelID = (!empty($guild['embed_channel_id']) ? ((int) $guild['embed_channel_id']) : $this->embedChannelID);
         $this->widgetEnabled = (bool) ($guild['widget_enabled'] ?? $this->widgetEnabled);
-        $this->widgetChannelID = $guild['widget_channel_id'] ?? $this->widgetChannelID;
+        $this->widgetChannelID = (!empty($guild['widget_channel_id']) ? ((int) $guild['widget_channel_id']) : $this->widgetChannelID);
         
         foreach($guild['roles'] as $role) {
             $this->roles->factory($role);

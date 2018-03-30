@@ -33,7 +33,7 @@ class MessageDeleteBulk implements \CharlotteDunois\Yasmin\Interfaces\WSEventInt
                     $channel->messages->delete($message->id);
                     $messages->set($message->id, $message);
                 } else {
-                    $messagesRaw[] = $id;
+                    $messagesRaw[] = (int) $id;
                 }
             }
             

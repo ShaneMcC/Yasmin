@@ -42,7 +42,8 @@ class Json implements \CharlotteDunois\Yasmin\Interfaces\WSEncodingInterface {
             throw new \InvalidArgumentException('The JSON decoder was unable to decode the data. Error: '.\json_last_error_msg());
         }
         
-        return $msg;
+        $obj = $this->convertIDs($msg);
+        return $obj;
     }
     
     /**
@@ -66,5 +67,28 @@ class Json implements \CharlotteDunois\Yasmin\Interfaces\WSEncodingInterface {
         $msg->addFrame($frame);
         
         return $msg;
+    }
+    
+    /**
+     * Converts all IDs from strings to integers.
+     * @param array|object
+     * @return array|object
+     */
+    protected function convertIDs($data) {
+        $arr = array();
+        
+        foreach($data as $key => $val) {
+            if(\is_array($val) || \is_object($val)) {
+                $arr[$key] = $this->convertIDs($val);
+            } else {
+                if(\is_string($val) && ($key === 'id' || \mb_substr($key, -3) === '_id')) {
+                    $val = (int) $val;
+                }
+                
+                $arr[$key] = $val;
+            }
+        }
+        
+        return (\is_object($data) ? ((object) $arr) : $arr);
     }
 }

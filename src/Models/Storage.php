@@ -40,6 +40,39 @@ class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
     }
     
     /**
+     * @inheritDoc
+     */
+    function has($key) {
+        if(\is_array($key) || \is_object($key)) {
+            return false;
+        }
+        
+        return parent::get(((int) $key));
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    function get($key) {
+        if(\is_array($key) || \is_object($key)) {
+            return null;
+        }
+        
+        return parent::get(((int) $key));
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    function set($key, $val) {
+        if(\is_array($key) || \is_object($key)) {
+            throw new \InvalidArgumentException('Key can not be an array or object');
+        }
+        
+        return parent::set(((int) $key), $val);
+    }
+    
+    /**
      * @internal
      */
     function serialize() {

@@ -54,8 +54,8 @@ class Etf implements \CharlotteDunois\Yasmin\Interfaces\WSEncodingInterface {
             throw new \InvalidArgumentException('The ETF decoder was unable to decode the data');
         }
         
-        $obj = $this->convertIDs($msg);
-        return $obj;
+        $msg = $this->convert($msg);
+        return $msg;
     }
     
     /**
@@ -84,11 +84,11 @@ class Etf implements \CharlotteDunois\Yasmin\Interfaces\WSEncodingInterface {
     }
     
     /**
-     * Converts all IDs from integer to strings.
+     * Converts all objects.
      * @param array|object
      * @return array|object
      */
-    protected function convertIDs($data) {
+    protected function convert($data) {
         $arr = array();
         
         foreach($data as $key => $val) {
@@ -99,10 +99,6 @@ class Etf implements \CharlotteDunois\Yasmin\Interfaces\WSEncodingInterface {
             } elseif(\is_array($val) || \is_object($val)) {
                 $arr[$key] = $this->convertIDs($val);
             } else {
-                if(\is_int($val) && ($key === 'id' || \mb_substr($key, -3) === '_id')) {
-                    $val = (string) $val;
-                }
-                
                 $arr[$key] = $val;
             }
         }

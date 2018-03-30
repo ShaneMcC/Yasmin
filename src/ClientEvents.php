@@ -39,10 +39,12 @@ interface ClientEvents {
     /**
      * Emitted when an uncached message gets deleted.
      */
-    function messageDeleteRaw(\CharlotteDunois\Yasmin\Interfaces\TextChannelInterface $channel, string $messageID);
+    function messageDeleteRaw(\CharlotteDunois\Yasmin\Interfaces\TextChannelInterface $channel, int $messageID);
     
     /**
      * Emitted when multple uncached messages gets deleted.
+     * @param \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface $channel
+     * @param int[]                                                   $messageIDs
      */
     function messageDeleteBulkRaw(\CharlotteDunois\Yasmin\Interfaces\TextChannelInterface $channel, array $messageIDs);
     
