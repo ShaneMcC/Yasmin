@@ -17,6 +17,7 @@
         "ext-mbstring": "*",
         "ratchet/pawl": "^0.3.1",
         "react/event-loop": "^0.4.3",
+        "react/filesystem": "^0.2.0",
         "react/promise": "^2.5.1",
         "guzzlehttp/guzzle": "^6.3.0",
         "charlottedunois/eventemitter": "^0.1.3",
