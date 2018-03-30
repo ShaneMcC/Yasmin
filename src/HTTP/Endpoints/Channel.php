@@ -119,12 +119,7 @@ final class Channel {
         return $this->api->makeRequest('PUT', $url, array());
     }
     
-    function deleteMessageReaction(int $channelid, int $messageid, string $emoji) {
-        $url = \CharlotteDunois\Yasmin\HTTP\APIEndpoints::format(self::ENDPOINTS['messages']['reactions']['delete'], $channelid, $messageid, $emoji);
-        return $this->api->makeRequest('DELETE', $url, array());
-    }
-    
-    function deleteMessageUserReaction(int $channelid, int $messageid, string $emoji, int $userid) {
+    function deleteMessageReaction(int $channelid, int $messageid, string $emoji, int $userid) {
         $url = \CharlotteDunois\Yasmin\HTTP\APIEndpoints::format(self::ENDPOINTS['messages']['reactions']['deleteUser'], $channelid, $messageid, $emoji, $userid);
         return $this->api->makeRequest('DELETE', $url, array());
     }

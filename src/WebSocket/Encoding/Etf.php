@@ -97,7 +97,7 @@ class Etf implements \CharlotteDunois\Yasmin\Interfaces\WSEncodingInterface {
             } elseif($val instanceof \CharlotteDunois\Erlpack\ErlpackObject) {
                 $arr[$key] = $val->toArray();
             } elseif(\is_array($val) || \is_object($val)) {
-                $arr[$key] = $this->convertIDs($val);
+                $arr[$key] = $this->convert($val);
             } else {
                 $arr[$key] = $val;
             }
