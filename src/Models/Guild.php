@@ -724,11 +724,11 @@ class Guild extends ClientBase {
     
     /**
      * Returns the guild's icon URL, or null.
+     * @param int|null  $size    Any power of 2.
      * @param string    $format  One of png, jpg or webp.
-     * @param int|null  $size    One of 128, 256, 512, 1024 or 2048.
      * @return string|null
      */
-    function getIconURL(string $format = 'png', ?int $size = null) {
+    function getIconURL(?int $size = null, string $format = 'png') {
         if($this->icon !== null) {
             return \CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['url'].\CharlotteDunois\Yasmin\HTTP\APIEndpoints::format(\CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['icons'], $this->id, $this->icon, $format).(!empty($size) ? '?size='.$size : '');
         }
@@ -738,11 +738,11 @@ class Guild extends ClientBase {
     
     /**
      * Returns the guild's splash URL, or null.
+     * @param int|null  $size    Any power of 2.
      * @param string    $format  One of png, jpg or webp.
-     * @param int|null  $size    One of 128, 256, 512, 1024 or 2048.
      * @return string|null
      */
-    function getSplashURL(string $format = 'png', ?int $size = null) {
+    function getSplashURL(?int $size = null, string $format = 'png') {
         if($this->splash !== null) {
             return \CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['url'].\CharlotteDunois\Yasmin\HTTP\APIEndpoints::format(\CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['splashes'], $this->id, $this->splash, $format).(!empty($size) ? '?size='.$size : '');
         }
