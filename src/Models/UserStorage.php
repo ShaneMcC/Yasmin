@@ -14,7 +14,7 @@ namespace CharlotteDunois\Yasmin\Models;
  */
 class UserStorage extends Storage {
     /**
-     * @var \React\EventLoop\TimerInterface
+     * @var \React\EventLoop\TimerInterface|\React\EventLoop\Timer\TimerInterface
      */
     protected $timer;
     
@@ -67,6 +67,15 @@ class UserStorage extends Storage {
         }
         
         return $this->factory($user);
+    }
+    
+    /**
+     * Returns the item for a given key. If the key does not exist, null is returned.
+     * @param mixed  $key
+     * @return \CharlotteDunois\Yasmin\Models\User|null
+     */
+    function get($key) {
+        return parent::get($key);
     }
     
     /**

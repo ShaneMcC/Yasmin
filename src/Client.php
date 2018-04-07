@@ -207,7 +207,9 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
      *
      * @param \React\EventLoop\LoopInterface|null  $loop     You can pass an event loop to the class, or it will automatically create one (you still need to make it run yourself).
      * @param array                                $options  Any client options.
-     * @throws \Exception|\RuntimeException
+     * @throws \Exception
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      *
      * @see \CharlotteDunois\Yasmin\ClientEvents
      */
@@ -781,10 +783,10 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
     
     /**
      * Cancels a timer.
-     * @param \React\EventLoop\TimerInterface  $timer
+     * @param \React\EventLoop\TimerInterface|\React\EventLoop\Timer\TimerInterface  $timer
      * @return bool
      */
-    function cancelTimer(\React\EventLoop\TimerInterface $timer) {
+    function cancelTimer($timer) {
         $this->loop->cancelTimer($timer);
         
         $key = \array_search($timer, $this->timers, true);

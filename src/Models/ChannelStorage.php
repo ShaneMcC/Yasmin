@@ -51,6 +51,15 @@ class ChannelStorage extends Storage {
     }
     
     /**
+     * Returns the item for a given key. If the key does not exist, null is returned.
+     * @param mixed  $key
+     * @return \CharlotteDunois\Yasmin\Interfaces\ChannelInterface|null
+     */
+    function get($key) {
+        return parent::get($key);
+    }
+    
+    /**
      * @inheritDoc
      */
     function set($key, $value) {
@@ -92,7 +101,7 @@ class ChannelStorage extends Storage {
     /**
      * @internal
      */
-    function factory(array $data, \CharlotteDunois\Yasmin\Models\Guild $guild = null) {
+    function factory(array $data, ?\CharlotteDunois\Yasmin\Models\Guild $guild = null) {
         if($guild === null) {
             $guild = (!empty($data['guild_id']) ? $this->client->guilds->get($data['guild_id']) : null);
         }
