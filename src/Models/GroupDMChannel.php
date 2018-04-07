@@ -21,7 +21,7 @@ class GroupDMChannel extends DMChannel {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, array $channel) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, array $channel) {
         parent::__construct($client, $channel);
         
         $this->applicationID = $channel['application_id'] ?? null;

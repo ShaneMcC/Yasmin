@@ -32,7 +32,7 @@ class RichPresenceAssets extends ClientBase {
      * @param array                                    $assets      An array containing the presence data.
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Activity $activity, array $assets) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, \CharlotteDunois\Yasmin\Models\Activity &$activity, array $assets) {
         parent::__construct($client);
         $this->activity = $activity;
         

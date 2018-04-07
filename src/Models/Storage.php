@@ -20,7 +20,7 @@ class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, array $data = null) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, array $data = null) {
         parent::__construct($data);
         $this->client = $client;
     }

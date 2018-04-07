@@ -17,7 +17,7 @@ interface WSEventInterface {
     /**
      * Constructor.
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager);
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, \CharlotteDunois\Yasmin\WebSocket\WSManager &$wsmanager);
     
     /**
      * Handles events.

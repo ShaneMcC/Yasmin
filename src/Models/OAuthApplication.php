@@ -34,7 +34,7 @@ class OAuthApplication extends ClientBase {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, array $application) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, array $application) {
         parent::__construct($client);
         
         $this->id = $application['id'];

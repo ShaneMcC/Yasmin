@@ -18,7 +18,7 @@ class GuildMemberStorage extends Storage {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Guild $guild, ?array $data = null) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, \CharlotteDunois\Yasmin\Models\Guild &$guild, ?array $data = null) {
         parent::__construct($client, $data);
         $this->guild = $guild;
     }
@@ -61,7 +61,7 @@ class GuildMemberStorage extends Storage {
     /**
      * @internal
      */
-    function factory(array $data) {
+    function &factory(array $data) {
         if($this->has($data['user']['id'])) {
             $member = $this->get($data['user']['id']);
             $member->_patch($data);

@@ -54,7 +54,7 @@ class User extends ClientBase {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, array $user, bool $isWebhook = false, bool $userFetched = false) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, array $user, bool $isWebhook = false, bool $userFetched = false) {
         parent::__construct($client);
         
         $this->id = $user['id'];

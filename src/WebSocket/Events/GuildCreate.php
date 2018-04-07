@@ -18,7 +18,7 @@ class GuildCreate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface
     protected $client;
     protected $ready = false;
     
-    function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, \CharlotteDunois\Yasmin\WebSocket\WSManager &$wsmanager) {
         $this->client = $client;
         
         $this->client->once('ready', function () {

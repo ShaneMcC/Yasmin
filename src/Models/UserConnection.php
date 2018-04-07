@@ -29,7 +29,7 @@ class UserConnection extends ClientBase {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\User $user, array $connection) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, \CharlotteDunois\Yasmin\Models\User &$user, array $connection) {
         parent::__construct($client);
         $this->user = $user;
         

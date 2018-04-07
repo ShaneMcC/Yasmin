@@ -38,7 +38,7 @@ class MessageActivity extends ClientBase {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, array $activity) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, array $activity) {
         parent::__construct($client);
         
         $this->partyID = $activity['party_id'] ?? null;

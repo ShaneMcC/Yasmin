@@ -17,7 +17,7 @@ class Heartbeat implements \CharlotteDunois\Yasmin\Interfaces\WSHandlerInterface
     public $heartbeat;
     protected $wshandler;
     
-    function __construct(\CharlotteDunois\Yasmin\WebSocket\WSHandler $wshandler) {
+    function __construct(\CharlotteDunois\Yasmin\WebSocket\WSHandler &$wshandler) {
         $this->wshandler = $wshandler;
     }
     

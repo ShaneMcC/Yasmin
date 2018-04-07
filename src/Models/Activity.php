@@ -75,7 +75,7 @@ class Activity extends ClientBase {
      * @param \CharlotteDunois\Yasmin\Client  $client      The client this instance is for.
      * @param array                           $activity    An array containing name, type (as int) and url (nullable).
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, array $activity) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, array $activity) {
         parent::__construct($client);
         
         $this->name = $activity['name'];

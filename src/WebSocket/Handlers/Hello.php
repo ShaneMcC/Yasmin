@@ -20,7 +20,7 @@ class Hello implements \CharlotteDunois\Yasmin\Interfaces\WSHandlerInterface {
     /** @var \CharlotteDunois\Yasmin\WebSocket\WSHandler */
     protected $wshandler;
     
-    function __construct(\CharlotteDunois\Yasmin\WebSocket\WSHandler $wshandler) {
+    function __construct(\CharlotteDunois\Yasmin\WebSocket\WSHandler &$wshandler) {
         $this->wshandler = $wshandler;
         
         $this->wshandler->wsmanager->on('close', function () {

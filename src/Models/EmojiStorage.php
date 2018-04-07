@@ -18,7 +18,7 @@ class EmojiStorage extends Storage {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, ?\CharlotteDunois\Yasmin\Models\Guild $guild = null, ?array $data = null) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, ?\CharlotteDunois\Yasmin\Models\Guild &$guild = null, ?array $data = null) {
         parent::__construct($client, $data);
         $this->guild = $guild;
     }
@@ -76,7 +76,7 @@ class EmojiStorage extends Storage {
     /**
      * @internal
      */
-    function factory(array $data) {
+    function &factory(array $data) {
         if($this->has($data['id'])) {
             $emoji = $this->get($data['id']);
             $emoji->_patch($data);

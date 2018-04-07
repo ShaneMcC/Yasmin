@@ -28,7 +28,7 @@ class WSHandler {
      * DO NOT initialize this class yourself.
      * @param \CharlotteDunois\Yasmin\WebSocket\WSManager  $wsmanager
      */
-    function __construct(\CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
+    function __construct(\CharlotteDunois\Yasmin\WebSocket\WSManager &$wsmanager) {
         $this->wsmanager = $wsmanager;
         
         $this->register(\CharlotteDunois\Yasmin\WebSocket\WSManager::OPCODES['DISPATCH'], '\CharlotteDunois\Yasmin\WebSocket\Handlers\Dispatch');

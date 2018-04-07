@@ -18,7 +18,7 @@ class GuildMemberUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInt
     protected $client;
     protected $clones = false;
     
-    function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, \CharlotteDunois\Yasmin\WebSocket\WSManager &$wsmanager) {
         $this->client = $client;
         
         $clones = $this->client->getOption('disableClones', array());

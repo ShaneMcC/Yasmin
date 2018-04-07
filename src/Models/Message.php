@@ -94,7 +94,7 @@ class Message extends ClientBase {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface $channel, array $message) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface &$channel, array $message) {
         parent::__construct($client);
         $this->channel = $channel;
         

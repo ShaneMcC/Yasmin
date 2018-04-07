@@ -94,7 +94,7 @@ class AuditLogEntry extends ClientBase {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\AuditLog $log, array $entry) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, \CharlotteDunois\Yasmin\Models\AuditLog &$log, array $entry) {
         parent::__construct($client);
         $this->log = $log;
         

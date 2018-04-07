@@ -42,7 +42,7 @@ class Invite extends ClientBase {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, array $invite) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, array $invite) {
         parent::__construct($client);
         
         $this->code = $invite['code'];

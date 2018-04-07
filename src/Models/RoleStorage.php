@@ -18,7 +18,7 @@ class RoleStorage extends Storage {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Guild $guild, array $data = null) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, \CharlotteDunois\Yasmin\Models\Guild &$guild, array $data = null) {
         parent::__construct($client, $data);
         $this->guild = $guild;
     }
@@ -57,7 +57,7 @@ class RoleStorage extends Storage {
     /**
      * @internal
      */
-    function factory(array $data) {
+    function &factory(array $data) {
         if($this->has($data['id'])) {
             $role = $this->get($data['id']);
             $role->_patch($data);

@@ -21,7 +21,7 @@ class UserStorage extends Storage {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, array $data = null) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, array $data = null) {
         parent::__construct($client, $data);
         
         $inv = (int) $this->client->getOption('userSweepInterval', 600);
@@ -61,9 +61,10 @@ class UserStorage extends Storage {
     /**
      * @internal
      */
-    function patch(array $user) {
+    function &patch(array $user) {
         if($this->has($user['id'])) {
-            return $this->get($user['id']);
+            $usr = $this->get($user['id']);
+            return $usr;
         }
         
         if(count($user) === 1) {
@@ -109,7 +110,7 @@ class UserStorage extends Storage {
     /**
      * @internal
      */
-    function factory(array $data, bool $userFetched = false) {
+    function &factory(array $data, bool $userFetched = false) {
         if($this->has($data['id'])) {
             $user = $this->get($data['id']);
             $user->_patch($data);

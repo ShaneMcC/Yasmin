@@ -29,7 +29,7 @@ class MessageReaction extends ClientBase {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Message $message, \CharlotteDunois\Yasmin\Models\Emoji $emoji, array $reaction) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, \CharlotteDunois\Yasmin\Models\Message &$message, \CharlotteDunois\Yasmin\Models\Emoji &$emoji, array $reaction) {
         parent::__construct($client);
         $this->message = $message;
         $this->emoji = $emoji;

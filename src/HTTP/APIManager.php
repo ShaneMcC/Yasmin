@@ -76,7 +76,7 @@ class APIManager {
      * DO NOT initialize this class yourself.
      * @param \CharlotteDunois\Yasmin\Client $client
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client) {
         $this->client = $client;
         $this->endpoints = new \CharlotteDunois\Yasmin\HTTP\APIEndpoints($this);
         

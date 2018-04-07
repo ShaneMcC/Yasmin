@@ -40,7 +40,7 @@ class Presence extends ClientBase {
      *
      * @throws \RuntimeException
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, array $presence) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, array $presence) {
         parent::__construct($client);
         $this->user = $this->client->users->patch($presence['user']);
         

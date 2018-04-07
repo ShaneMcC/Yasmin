@@ -135,7 +135,7 @@ class Guild extends ClientBase {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, array $guild) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, array $guild) {
         parent::__construct($client);
         
         $this->client->guilds->set($guild['id'], $this);

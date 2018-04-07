@@ -31,7 +31,7 @@ class VoiceRegion extends ClientBase {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, array $region) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, array $region) {
         parent::__construct($client);
         
         $this->id = $region['id'];

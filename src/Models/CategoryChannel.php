@@ -40,7 +40,7 @@ class CategoryChannel extends ClientBase
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Guild $guild, array $channel) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, \CharlotteDunois\Yasmin\Models\Guild &$guild, array $channel) {
         parent::__construct($client);
         $this->guild = $guild;
         

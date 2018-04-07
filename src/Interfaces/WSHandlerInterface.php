@@ -17,7 +17,7 @@ interface WSHandlerInterface {
     /**
      * Constructor.
      */
-    function __construct(\CharlotteDunois\Yasmin\WebSocket\WSHandler $wshandler);
+    function __construct(\CharlotteDunois\Yasmin\WebSocket\WSHandler &$wshandler);
     
     /**
      * Handles packets.

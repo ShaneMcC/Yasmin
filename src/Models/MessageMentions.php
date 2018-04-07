@@ -55,7 +55,7 @@ class MessageMentions extends ClientBase {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Message $message, array $msg) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, \CharlotteDunois\Yasmin\Models\Message &$message, array $msg) {
         parent::__construct($client);
         $this->message = $message;
         

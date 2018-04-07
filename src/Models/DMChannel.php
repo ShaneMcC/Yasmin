@@ -43,7 +43,7 @@ class DMChannel extends ClientBase
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, array $channel) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, array $channel) {
         parent::__construct($client);
         
         $storage = $this->client->getOption('internal.storages.messages');

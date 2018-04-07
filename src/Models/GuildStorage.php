@@ -71,7 +71,7 @@ class GuildStorage extends Storage {
     /**
      * @internal
      */
-    function factory(array $data) {
+    function &factory(array $data) {
         if($this->has($data['id'])) {
             $guild = $this->get($data['id']);
             $guild->_patch($data);

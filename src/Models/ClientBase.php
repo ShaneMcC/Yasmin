@@ -29,7 +29,7 @@ class ClientBase extends Base {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client) {
         $this->client = $client;
     }
     

@@ -16,7 +16,7 @@ namespace CharlotteDunois\Yasmin\WebSocket\Handlers;
 class Reconnect implements \CharlotteDunois\Yasmin\Interfaces\WSHandlerInterface {
     protected $wshandler;
     
-    function __construct(\CharlotteDunois\Yasmin\WebSocket\WSHandler $wshandler) {
+    function __construct(\CharlotteDunois\Yasmin\WebSocket\WSHandler &$wshandler) {
         $this->wshandler = $wshandler;
     }
     

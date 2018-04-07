@@ -17,7 +17,7 @@ class Dispatch implements \CharlotteDunois\Yasmin\Interfaces\WSHandlerInterface 
     private $wsevents = array();
     protected $wshandler;
     
-    function __construct(\CharlotteDunois\Yasmin\WebSocket\WSHandler $wshandler) {
+    function __construct(\CharlotteDunois\Yasmin\WebSocket\WSHandler &$wshandler) {
         $this->wshandler = $wshandler;
         
         $allEvents = array(

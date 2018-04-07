@@ -17,7 +17,7 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
 class MessageCreate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
     protected $client;
     
-    function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, \CharlotteDunois\Yasmin\WebSocket\WSManager &$wsmanager) {
         $this->client = $client;
     }
     

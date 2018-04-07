@@ -30,7 +30,7 @@ class PartialChannel extends ClientBase {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, array $channel) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, array $channel) {
         parent::__construct($client);
         
         $this->id = $channel['id'];

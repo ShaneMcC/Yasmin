@@ -52,7 +52,7 @@ final class APIRequest {
      * @param string                                   $endpoint
      * @param array                                    $options
      */
-    function __construct(\CharlotteDunois\Yasmin\HTTP\APIManager $api, string $method, string $endpoint, array $options) {
+    function __construct(\CharlotteDunois\Yasmin\HTTP\APIManager &$api, string $method, string $endpoint, array $options) {
         $this->api = $api;
         $this->url = \CharlotteDunois\Yasmin\HTTP\APIEndpoints::HTTP['url'].'v'.\CharlotteDunois\Yasmin\HTTP\APIEndpoints::HTTP['version'].'/';
         

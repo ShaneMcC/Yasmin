@@ -27,7 +27,7 @@ class AuditLog extends ClientBase {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Guild $guild, array $audit) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, \CharlotteDunois\Yasmin\Models\Guild &$guild, array $audit) {
         parent::__construct($client);
         $this->guild = $guild;
         

@@ -41,7 +41,7 @@ class Emoji extends ClientBase {
     /**
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, ?\CharlotteDunois\Yasmin\Models\Guild $guild, array $emoji) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, ?\CharlotteDunois\Yasmin\Models\Guild &$guild, array $emoji) {
         parent::__construct($client);
         
         $this->id = (!empty($emoji['id']) ? $emoji['id'] : null);

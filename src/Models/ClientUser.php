@@ -37,7 +37,7 @@ class ClientUser extends User {
      * @param array                          $user
      * @internal
      */
-    function __construct(\CharlotteDunois\Yasmin\Client $client, $user) {
+    function __construct(\CharlotteDunois\Yasmin\Client &$client, $user) {
         parent::__construct($client, $user);
         
         $presence = $this->client->getOption('ws.presence', array());
