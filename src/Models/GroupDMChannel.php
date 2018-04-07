@@ -29,17 +29,6 @@ class GroupDMChannel extends DMChannel {
     }
     
     /**
-     * @internal
-     */
-    function __destruct() {
-        if($this->messages) {
-            $this->messages->clear();
-        }
-        
-        parent::__destruct();
-    }
-    
-    /**
      * Adds the given user to the Group DM channel using the given access token. Resolves with $this.
      * @param string|\CharlotteDunois\Yasmin\Models\User  $user         The User instance, or the user ID.
      * @param string                                      $accessToken  The OAuth 2.0 access token for the user.

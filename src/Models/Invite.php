@@ -27,11 +27,11 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property string                                                                                                       $url                 Returns the URL for the invite.
  */
 class Invite extends ClientBase {
-    protected $code;
     protected $guildID;
     protected $channelID;
     protected $inviterID;
     
+    protected $code;
     protected $createdTimestamp;
     protected $maxUses;
     protected $maxAge;
