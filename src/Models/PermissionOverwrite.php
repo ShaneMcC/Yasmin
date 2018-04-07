@@ -14,15 +14,15 @@ namespace CharlotteDunois\Yasmin\Models;
  *
  * @property  string                                                                                $id        The ID of the Permission Overwrite.
  * @property  string                                                                                $type      The type of the overwrite (member or role).
- * @property  \CharlotteDunois\Yasmin\Models\Role|\CharlotteDunois\Yasmin\Models\GuildMember|null   $target    The role or guildmember, or null if not a member.
  * @property  \CharlotteDunois\Yasmin\Models\Permissions                                            $allow     The allowed Permissions instance.
  * @property  \CharlotteDunois\Yasmin\Models\Permissions                                            $deny      The denied Permissions instance.
  *
- * @property  \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface                              $channel   The channel this Permission Overwrite belongs to.
- * @property  \CharlotteDunois\Yasmin\Models\Guild                                                  $guild     The guild this Permission Overwrite belongs to.
+ * @property  \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface|null                         $channel   The channel this Permission Overwrite belongs to, or null.
+ * @property  \CharlotteDunois\Yasmin\Models\Guild|null                                             $guild     The guild this Permission Overwrite belongs to, or null.
+ * @property  \CharlotteDunois\Yasmin\Models\Role|\CharlotteDunois\Yasmin\Models\GuildMember|null   $target    The role or guildmember, or null.
  */
 class PermissionOverwrite extends ClientBase {
-    protected $channel;
+    protected $channelID;
     
     protected $id;
     protected $type;
@@ -35,11 +35,10 @@ class PermissionOverwrite extends ClientBase {
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface $channel, array $permission) {
         parent::__construct($client);
-        $this->channel = $channel;
+        $this->channelID = $channel->id;
         
         $this->id = $permission['id'];
         $this->type = $permission['type'];
-        $this->target = ($this->type === 'role' ? $this->channel->guild->roles->get($permission['id']) : $this->channel->guild->members->get($permission['id']));
         $this->allow = new \CharlotteDunois\Yasmin\Models\Permissions(($permission['allow'] ?? 0));
         $this->deny = new \CharlotteDunois\Yasmin\Models\Permissions(($permission['deny'] ?? 0));
     }
@@ -56,8 +55,24 @@ class PermissionOverwrite extends ClientBase {
         }
         
         switch($name) {
+            case 'channel':
+                return $this->client->channels->get($this->channelID);
+            break;
             case 'guild':
-                return $this->channel->guild;
+                $channel = $this->client->channels->get($this->channelID);
+                if($channel) {
+                    return $channel->guild;
+                }
+                
+                return null;
+            break;
+            case 'target':
+                $channel = $this->client->channels->get($this->channelID);
+                if($channel) {
+                    return ($this->type === 'role' ? $channel->guild->roles->get($permission['id']) : $channel->guild->members->get($permission['id']));
+                }
+                
+                return null;
             break;
         }
         

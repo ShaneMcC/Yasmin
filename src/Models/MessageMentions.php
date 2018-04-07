@@ -12,7 +12,6 @@ namespace CharlotteDunois\Yasmin\Models;
 /**
  * Holds message mentions.
  *
- * @property \CharlotteDunois\Yasmin\Models\Message      $message   The message this reaction belongs to.
  * @property \CharlotteDunois\Yasmin\Utils\Collection    $channels  The collection which holds all channel mentions.
  * @property bool                                        $everyone  Whether the message mentions @everyone or @here.
  * @property \CharlotteDunois\Yasmin\Utils\Collection    $members   The collection which holds all members mentions (only in guild channels). Only cached members can be put into this Collection.
@@ -44,8 +43,6 @@ class MessageMentions extends ClientBase {
      */
     const PATTERN_USERS = '/<@!?(\d+)>/';
     
-    protected $message;
-    
     protected $channels;
     protected $everyone;
     protected $members;
@@ -57,7 +54,6 @@ class MessageMentions extends ClientBase {
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Message $message, array $msg) {
         parent::__construct($client);
-        $this->message = $message;
         
         $this->channels = new \CharlotteDunois\Yasmin\Utils\Collection();
         $this->members = new \CharlotteDunois\Yasmin\Utils\Collection();
@@ -101,6 +97,29 @@ class MessageMentions extends ClientBase {
                 }
             }
         }
+    }
+    
+    /**
+     * @internal
+     */
+    function __destruct() {
+        if($this->channels) {
+            $this->channels->clear();
+        }
+        
+        if($this->members) {
+            $this->members->clear();
+        }
+        
+        if($this->roles) {
+            $this->roles->clear();
+        }
+        
+        if($this->users) {
+            $this->users->clear();
+        }
+        
+        parent::__destruct();
     }
     
     /**

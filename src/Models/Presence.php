@@ -12,16 +12,12 @@ namespace CharlotteDunois\Yasmin\Models;
 /**
  * Represents a presence.
  *
- * @property \CharlotteDunois\Yasmin\Models\User           $user      The user this presence belongs to.
+ * @property \CharlotteDunois\Yasmin\Models\User|null      $user      The user this presence belongs to, or null.
  * @property \CharlotteDunois\Yasmin\Models\Activity|null  $activity  The activity the user is doing, or null.
  * @property string                                        $status    What do you expect this to be?
  */
 class Presence extends ClientBase {
-    /**
-     * The user this presence belongs to.
-     * @var \CharlotteDunois\Yasmin\Models\User
-     */
-    protected $user;
+    protected $userID;
     
     /**
      * @var \CharlotteDunois\Yasmin\Models\Activity
@@ -42,7 +38,7 @@ class Presence extends ClientBase {
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, array $presence) {
         parent::__construct($client);
-        $this->user = $this->client->users->patch($presence['user']);
+        $this->userID = $this->client->users->patch($presence['user'])->id;
         
         $this->_patch($presence);
     }
@@ -54,6 +50,10 @@ class Presence extends ClientBase {
     function __get($name) {
         if(\property_exists($this, $name)) {
             return $this->$name;
+        }
+        
+        if($name === 'user') {
+            return $this->client->users->get($this->userID);
         }
         
         return parent::__get($name);

@@ -12,8 +12,8 @@ namespace CharlotteDunois\Yasmin\Models;
 /**
  * Represents a Group DM channel.
  *
- * @property  string|null  $applicationID  Returns the application ID which created the group DM channel.
- * @property  string|null  $icon           The icon of the Group DM channel.
+ * @property  string|null  $applicationID  Returns the application ID which created the group DM channel, or null.
+ * @property  string|null  $icon           The icon of the Group DM channel, or null.
  */
 class GroupDMChannel extends DMChannel {
     protected $applicationID;
@@ -26,6 +26,17 @@ class GroupDMChannel extends DMChannel {
         
         $this->applicationID = $channel['application_id'] ?? null;
         $this->icon = $channel['icon'] ?? null;
+    }
+    
+    /**
+     * @internal
+     */
+    function __destruct() {
+        if($this->messages) {
+            $this->messages->clear();
+        }
+        
+        parent::__destruct();
     }
     
     /**

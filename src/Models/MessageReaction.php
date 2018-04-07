@@ -12,15 +12,16 @@ namespace CharlotteDunois\Yasmin\Models;
 /**
  * Represents a message reaction.
  *
- * @property \CharlotteDunois\Yasmin\Models\Emoji        $emoji     The emoji this message reaction is for.
- * @property int                                         $count     Times this emoji has been reacted.
- * @property bool                                        $me        Whether the current user has reacted using this emoji.
- * @property \CharlotteDunois\Yasmin\Models\Message      $message   The message this reaction belongs to.
- * @property \CharlotteDunois\Yasmin\Utils\Collection    $users     The users that have given this reaction, mapped by their ID.
+ * @property int                                          $count     Times this emoji has been reacted.
+ * @property bool                                         $me        Whether the current user has reacted using this emoji.
+ * @property \CharlotteDunois\Yasmin\Utils\Collection     $users     The users that have given this reaction, mapped by their ID.
+ *
+ * @property \CharlotteDunois\Yasmin\Models\Emoji|null    $emoji     The emoji this message reaction is for, or null.
+ * @property \CharlotteDunois\Yasmin\Models\Message|null  $message   The message this reaction belongs to, or null.
  */
 class MessageReaction extends ClientBase {
-    protected $message;
-    protected $emoji;
+    protected $messageID;
+    protected $emojiID;
     
     protected $count;
     protected $me;
@@ -31,12 +32,23 @@ class MessageReaction extends ClientBase {
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Message $message, \CharlotteDunois\Yasmin\Models\Emoji $emoji, array $reaction) {
         parent::__construct($client);
-        $this->message = $message;
-        $this->emoji = $emoji;
+        $this->messageID = array($message->channelID, $message->id);
+        $this->emojiID = $emoji->id;
         
         $this->count = (int) $reaction['count'];
         $this->me = (bool) $reaction['me'];
         $this->users = new \CharlotteDunois\Yasmin\Utils\Collection();
+    }
+    
+    /**
+     * @internal
+     */
+    function __destruct() {
+        if($this->users) {
+            $this->users->clear();
+        }
+        
+        parent::__destruct();
     }
     
     /**
@@ -48,6 +60,20 @@ class MessageReaction extends ClientBase {
     function __get($name) {
         if(\property_exists($this, $name)) {
             return $this->$name;
+        }
+        
+        switch($name) {
+            case 'message':
+                $channel = $this->client->channels->get($this->messageID[0]);
+                if($channel) {
+                    return $channel->messages->get($this->messageID[1]);
+                }
+                
+                return null;
+            break;
+            case 'emoji':
+                return $this->client->emojis->get($this->emojiID);
+            break;
         }
         
         return parent::__get($name);

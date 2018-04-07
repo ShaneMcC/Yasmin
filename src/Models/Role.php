@@ -12,7 +12,6 @@ namespace CharlotteDunois\Yasmin\Models;
 /**
  * Represents a role.
  *
- * @property \CharlotteDunois\Yasmin\Models\Guild        $guild               The guild the role belongs to.
  * @property string                                      $id                  The role ID.
  * @property string                                      $name                The role name.
  * @property int                                         $createdTimestamp    When the role was created.
@@ -26,6 +25,7 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property int                                         $calculatedPosition  The role position in the role manager.
  * @property \DateTime                                   $createdAt           The DateTime instance of createdTimestamp.
  * @property bool                                        $editable            Whether the role can be edited by the client user.
+ * @property \CharlotteDunois\Yasmin\Models\Guild|null   $guild               The guild the role belongs to, or null.
  * @property string                                      $hexColor            Returns the hex color of the role color.
  * @property \CharlotteDunois\Yasmin\Utils\Collection    $members             A collection of all (cached) guild members which have the role.
  */
@@ -58,7 +58,7 @@ class Role extends ClientBase {
         'DARK_NAVY' => 2899536
     );
     
-    protected $guild;
+    protected $guildID;
     
     protected $id;
     protected $name;
@@ -76,7 +76,7 @@ class Role extends ClientBase {
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Guild $guild, array $role) {
         parent::__construct($client);
-        $this->guild = $guild;
+        $this->guildID = $guild->id;
         
         $this->id = $role['id'];
         $this->createdTimestamp = (int) \CharlotteDunois\Yasmin\Utils\Snowflake::deconstruct($this->id)->timestamp;
@@ -117,6 +117,9 @@ class Role extends ClientBase {
                 }
                 
                 return ($member->highestRole->comparePositionTo($this) > 0);
+            break;
+            case 'guild':
+                return $this->client->guilds->get($this->guildID);
             break;
             case 'hexColor':
                 return '#'.\dechex($this->color);

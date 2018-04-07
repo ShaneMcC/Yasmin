@@ -70,6 +70,17 @@ class DMChannel extends ClientBase
     }
     
     /**
+     * @internal
+     */
+    function __destruct() {
+        if($this->messages) {
+            $this->messages->clear();
+        }
+        
+        parent::__destruct();
+    }
+    
+    /**
      * @inheritDoc
      *
      * @throws \RuntimeException

@@ -24,7 +24,7 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property  int                                                                                      $userLimit              The maximum amount of users allowed in the channel - 0 means unlimited.
  *
  * @property  bool                                                                                     $full                   Checks if the voice channel is full.
- * @property  \CharlotteDunois\Yasmin\Models\Guild                                                     $guild                  The guild the channel is in.
+ * @property  \CharlotteDunois\Yasmin\Models\Guild|null                                                $guild                  The guild the channel is in, or null.
  * @property  \CharlotteDunois\Yasmin\Models\CategoryChannel|null                                      $parent                 Returns the channel's parent, or null.
  * @property  bool|null                                                                                $permissionsLocked      If the permissionOverwrites match the parent channel, or null if no parent.
  * @property  bool                                                                                     $speakable              Whether the client has permission to send audio to the channel.
@@ -35,7 +35,7 @@ class VoiceChannel extends ClientBase
                 \CharlotteDunois\Yasmin\Interfaces\VoiceChannelInterface {
     use \CharlotteDunois\Yasmin\Traits\GuildChannelTrait;
     
-    protected $guild;
+    protected $guildID;
     
     protected $id;
     protected $type;
@@ -54,7 +54,7 @@ class VoiceChannel extends ClientBase
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Guild $guild, array $channel) {
         parent::__construct($client);
-        $this->guild = $guild;
+        $this->guildID = $guild->id;
         
         $this->id = $channel['id'];
         $this->type = \CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES[$channel['type']];
@@ -64,6 +64,21 @@ class VoiceChannel extends ClientBase
         $this->createdTimestamp = (int) \CharlotteDunois\Yasmin\Utils\Snowflake::deconstruct($this->id)->timestamp;
         
         $this->_patch($channel);
+    }
+    
+    /**
+     * @internal
+     */
+    function __destruct() {
+        if($this->members) {
+            $this->members->clear();
+        }
+        
+        if($this->permissionOverwrites) {
+            $this->permissionOverwrites->clear();
+        }
+        
+        parent::__destruct();
     }
     
     /**
@@ -81,6 +96,9 @@ class VoiceChannel extends ClientBase
         switch($name) {
             case 'full':
                 return ($this->userLimit > 0 && $this->userLimit > $this->members->count());
+            break;
+            case 'guild':
+                return $this->client->guilds->get($this->guildID);
             break;
             case 'parent':
                 return $this->guild->channels->get($this->parentID);

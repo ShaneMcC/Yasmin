@@ -13,14 +13,14 @@ namespace CharlotteDunois\Yasmin\Models;
  * Guild Member Storage to store guild members, utilizes Collection.
  */
 class GuildMemberStorage extends Storage {
-    protected $guild;
+    protected $guildID;
     
     /**
      * @internal
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Guild $guild, ?array $data = null) {
         parent::__construct($client, $data);
-        $this->guild = $guild;
+        $this->guildID = $guild->id;
     }
     
     /**
@@ -61,14 +61,14 @@ class GuildMemberStorage extends Storage {
     /**
      * @internal
      */
-    function factory(array $data) {
+    function factory(array $data, ?\CharlotteDunois\Yasmin\Models\Guild $guild = null) {
         if($this->has($data['user']['id'])) {
             $member = $this->get($data['user']['id']);
             $member->_patch($data);
             return $member;
         }
         
-        $member = new \CharlotteDunois\Yasmin\Models\GuildMember($this->client, $this->guild, $data);
+        $member = new \CharlotteDunois\Yasmin\Models\GuildMember($this->client, ($guild ?? $this->guild), $data);
         $this->set($member->id, $member);
         return $member;
     }

@@ -13,8 +13,6 @@ namespace CharlotteDunois\Yasmin\Models;
  * Represents a message.
  *
  * @property string                                                                                      $id                 The message ID.
- * @property \CharlotteDunois\Yasmin\Models\User                                                         $author             The user that created the message.
- * @property \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface                                     $channel            The channel this message was created in.
  * @property int                                                                                         $createdTimestamp   The timestamp of when this message was created.
  * @property int|null                                                                                    $editedTimestamp    The timestamp of when this message was edited, or null.
  * @property string                                                                                      $content            The message content.
@@ -32,13 +30,15 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property \CharlotteDunois\Yasmin\Models\MessageActivity|null                                         $activity           The activity attached to this message. Sent with Rich Presence-related chat embeds.
  * @property \CharlotteDunois\Yasmin\Models\MessageApplication|null                                      $application        The application attached to this message. Sent with Rich Presence-related chat embeds.
  *
+ * @property \CharlotteDunois\Yasmin\Models\User|null                                                    $author             The user that created the message, or null.
+ * @property \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface|null                                $channel            The channel this message was created in, or null.
  * @property \DateTime                                                                                   $createdAt          An DateTime instance of the createdTimestamp.
  * @property \DateTime|null                                                                              $editedAt           An DateTime instance of the editedTimestamp, or null.
  * @property bool                                                                                        $deletable          Whether the client user can delete the message.
  * @property bool                                                                                        $editable           Whether the client user can edit the message.
- * @property bool                                                                                        $pinnable           Whether the client user can pin the message.
  * @property \CharlotteDunois\Yasmin\Models\Guild|null                                                   $guild              The correspondending guild (if message posted in a guild), or null.
  * @property \CharlotteDunois\Yasmin\Models\GuildMember|null                                             $member             The correspondending guildmember of the author (if message posted in a guild), or null.
+ * @property bool                                                                                        $pinnable           Whether the client user can pin the message.
  */
 class Message extends ClientBase {
     /**
@@ -70,9 +70,10 @@ class Message extends ClientBase {
      */
     public static $replySeparator = ' ';
     
+    protected $channelID;
+    protected $authorID;
+    
     protected $id;
-    protected $author;
-    protected $channel;
     protected $content;
     protected $createdTimestamp;
     protected $editedTimestamp;
@@ -96,10 +97,10 @@ class Message extends ClientBase {
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface $channel, array $message) {
         parent::__construct($client);
-        $this->channel = $channel;
+        $this->channelID = $channel->id;
         
         $this->id = $message['id'];
-        $this->author = (empty($message['webhook_id']) ? $this->client->users->patch($message['author']) : new \CharlotteDunois\Yasmin\Models\User($this->client, $message['author'], true));
+        $this->authorID = (empty($message['webhook_id']) ? $this->client->users->patch($message['author'])->id : (new \CharlotteDunois\Yasmin\Models\User($this->client, $message['author'], true)));
         
         $this->author->lastMessageID = $this->id;
         $this->createdTimestamp = (int) \CharlotteDunois\Yasmin\Utils\Snowflake::deconstruct($this->id)->timestamp;
@@ -122,6 +123,21 @@ class Message extends ClientBase {
     }
     
     /**
+     * @internal
+     */
+    function __destruct() {
+        if($this->attachments) {
+            $this->attachments->clear();
+        }
+        
+        if($this->reactions) {
+            $this->reactions->clear();
+        }
+        
+        parent::__destruct();
+    }
+    
+    /**
      * @inheritDoc
      *
      * @throws \RuntimeException
@@ -133,6 +149,16 @@ class Message extends ClientBase {
         }
         
         switch($name) {
+            case 'author':
+                if($this->authorID instanceof \CharlotteDunois\Yasmin\Models\User) {
+                    return $this->authorID;
+                }
+                
+                return $this->client->users->get($this->authorID);
+            break;
+            case 'channel':
+                return $this->client->channels->get($this->channelID);
+            break;
             case 'createdAt':
                 return \CharlotteDunois\Yasmin\Utils\DataHelpers::makeDateTime($this->createdTimestamp);
             break;
@@ -158,8 +184,9 @@ class Message extends ClientBase {
                 return ($this->author->id === $this->client->user->id);
             break;
             case 'guild':
-                if($this->channel instanceof \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface) {
-                    return $this->channel->guild;
+                $channel = $this->client->channels->get($this->channelID);
+                if($channel) {
+                    return $channel->guild;
                 }
                 
                 return null;

@@ -16,7 +16,6 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property string|null                                                    $nickname         The nickname of the member, or null.
  * @property bool                                                           $deaf             Whether the member is server deafened.
  * @property bool                                                           $mute             Whether the member is server muted.
- * @property \CharlotteDunois\Yasmin\Models\Guild                           $guild            The guild this member belongs to.
  * @property int                                                            $joinedTimestamp  The timestamp of when this member joined.
  * @property bool                                                           $selfDeaf         Whether the member is locally deafened.
  * @property bool                                                           $selfMute         Whether the member is locally muted.
@@ -31,7 +30,8 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property int|null                                                       $displayColor     The displayed color of the member.
  * @property string|null                                                    $displayHexColor  The displayed color of the member as hex string.
  * @property string                                                         $displayName      The displayed name.
- * @property \CharlotteDunois\Yasmin\Models\Role                            $highestRole      The role of the member with the highest position.
+ * @property \CharlotteDunois\Yasmin\Models\Guild|null                      $guild            The guild this member belongs to, or null.
+ * @property \CharlotteDunois\Yasmin\Models\Role|null                       $highestRole      The role of the member with the highest position, or null.
  * @property \CharlotteDunois\Yasmin\Models\Role|null                       $hoistRole        The role used to show the member separately in the memberlist, or null.
  * @property \DateTime                                                      $joinedAt         An DateTime instance of joinedTimestamp.
  * @property bool                                                           $kickable         Whether the guild member is kickable by the client user.
@@ -41,7 +41,7 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property \CharlotteDunois\Yasmin\Models\VoiceChannel|null               $voiceChannel     The voice channel the member is in, if connected to voice, or null.
  */
 class GuildMember extends ClientBase {
-    protected $guild;
+    protected $guildID;
     
     protected $id;
     protected $nickname;
@@ -63,7 +63,7 @@ class GuildMember extends ClientBase {
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Guild $guild, array $member) {
         parent::__construct($client);
-        $this->guild = $guild;
+        $this->guildID = $guild->id;
         
         $this->id = $member['user']['id'];
         $this->client->users->patch($member['user']);
@@ -72,6 +72,17 @@ class GuildMember extends ClientBase {
         $this->joinedTimestamp = (new \DateTime((!empty($member['joined_at']) ? $member['joined_at'] : 'now')))->getTimestamp();
         
         $this->_patch($member);
+    }
+    
+    /**
+     * @internal
+     */
+    function __destruct() {
+        if($this->roles) {
+            $this->roles->clear();
+        }
+        
+        parent::__destruct();
     }
     
     /**
@@ -134,6 +145,9 @@ class GuildMember extends ClientBase {
             break;
             case 'displayName':
                 return ($this->nickname ?? $this->user->username);
+            break;
+            case 'guild':
+                return $this->client->guilds->get($this->guildID);
             break;
             case 'highestRole':
                 return $this->roles->reduce(function ($prev, $role) {

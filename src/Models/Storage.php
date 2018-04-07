@@ -26,6 +26,18 @@ class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
     }
     
     /**
+     * @internal
+     */
+    function __destruct() {
+        $this->clear();
+        
+        foreach($this as $key => $val) {
+            $this->$key = null;
+            unset($val);
+        }
+    }
+    
+    /**
      * @inheritDoc
      *
      * @throws \RuntimeException
@@ -34,6 +46,12 @@ class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
     function __get($name) {
         if(\property_exists($this, $name)) {
             return $this->$name;
+        }
+        
+        if($name === 'guild' && \property_exists($this, 'guildID')) {
+            return $this->client->guilds->get($this->guildID);
+        } elseif($name === 'channel' && \property_exists($this, 'channelID')) {
+            return $this->client->channels->get($this->channelID);
         }
         
         throw new \RuntimeException('Unknown property '.\get_class($this).'::$'.$name);

@@ -73,6 +73,21 @@ class PresenceStorage extends Storage {
     }
     
     /**
+     * @inheritDoc
+     */
+    function clear() {
+        if($this !== $this->client->presences) {
+            foreach($this->data as $key => $val) {
+                $this->client->presences->delete($key);
+                unset($val);
+            }
+        }
+        
+        parent::clear();
+        return $this;
+    }
+    
+    /**
      * @internal
      */
     function factory(array $data) {

@@ -48,19 +48,7 @@ class GuildStorage extends Storage {
      * @inheritDoc
      */
     function delete($key) {
-        $guild = $this->get($key);
-        if($guild) {
-            $guild->channels->clear();
-            $guild->emojis->clear();
-            $guild->members->clear();
-            $guild->roles->clear();
-            $guild->presences->clear();
-            
-            unset($guild);
-        }
-        
         parent::delete($key);
-        
         if($this !== $this->client->guilds) {
             $this->client->guilds->delete($key);
         }

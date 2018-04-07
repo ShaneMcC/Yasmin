@@ -14,8 +14,6 @@ namespace CharlotteDunois\Yasmin\Models;
  *
  * @property string|null                                          $id                 The emoji ID, or null for unicode emoji.
  * @property string                                               $name               The emoji name.
- * @property \CharlotteDunois\Yasmin\Models\User|null             $user               The user that created the emoji, or null.
- * @property \CharlotteDunois\Yasmin\Models\Guild|null            $guild              The guild this emoji belongs to, or null.
  * @property int|null                                             $createdTimestamp   The timestamp of when this emoji was created, or null for unicode emoji.
  * @property bool                                                 $animated           Whether this emoji is animated.
  * @property boolean                                              $managed            Is the emoji managed?
@@ -24,15 +22,17 @@ namespace CharlotteDunois\Yasmin\Models;
  *
  * @property \DateTime|null                                       $createdAt          An DateTime instance of the createdTimestamp, or null for unicode emoji.
  * @property string                                               $identifier         The identifier for the emoji.
+ * @property \CharlotteDunois\Yasmin\Models\Guild|null            $guild              The guild this emoji belongs to, or null.
+ * @property \CharlotteDunois\Yasmin\Models\User|null             $user               The user that created the emoji, or null.
  * @property string|null                                          $url                The URL to the emoji image, or null for unicode emoji.
  */
 class Emoji extends ClientBase {
-    protected $guild;
+    protected $guildID;
+    protected $userID;
     
     protected $id;
     protected $name;
     protected $roles;
-    protected $user;
     protected $requireColons;
     protected $managed;
     
@@ -47,10 +47,21 @@ class Emoji extends ClientBase {
         $this->id = (!empty($emoji['id']) ? $emoji['id'] : null);
         $this->createdTimestamp = ($this->id ? ((int) \CharlotteDunois\Yasmin\Utils\Snowflake::deconstruct($this->id)->timestamp) : null);
         
-        $this->guild = ($this->id ? $guild : null);
+        $this->guildID = ($this->id ? $guild->id : null);
         $this->roles = new \CharlotteDunois\Yasmin\Utils\Collection();
         
         $this->_patch($emoji);
+    }
+    
+    /**
+     * @internal
+     */
+    function __destruct() {
+        if($this->roles) {
+            $this->roles->clear();
+        }
+        
+        parent::__destruct();
     }
     
     /**
@@ -72,6 +83,9 @@ class Emoji extends ClientBase {
                 
                 return null;
             break;
+            case 'guild':
+                return $this->client->guilds->get($this->guildID);
+            break;
             case 'identifier':
                 if($this->id !== null) {
                     return $this->name.':'.$this->id;
@@ -85,6 +99,9 @@ class Emoji extends ClientBase {
                 }
                 
                 return null;
+            break;
+            case 'user':
+                return $this->client->users->get($this->userID);
             break;
         }
         
@@ -261,7 +278,7 @@ class Emoji extends ClientBase {
      */
     function _patch(array $emoji) {
         $this->name = $emoji['name'];
-        $this->user = (!empty($emoji['user']) ? $this->client->users->patch($emoji['user']) : null);
+        $this->userID = (!empty($emoji['user']) ? $this->client->users->patch($emoji['user'])->id : null);
         $this->animated = (bool) ($emoji['animated'] ?? false);
         $this->managed = (bool) ($emoji['managed'] ?? false);
         $this->requireColons = (bool) ($emoji['require_colons'] ?? true);

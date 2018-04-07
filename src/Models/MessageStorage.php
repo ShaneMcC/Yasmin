@@ -13,7 +13,7 @@ namespace CharlotteDunois\Yasmin\Models;
  * Message Storage to store and handle messages, utilizes Collection.
  */
 class MessageStorage extends Storage {
-    protected $channel;
+    protected $channelID;
     protected $timer;
     
     /**
@@ -21,7 +21,7 @@ class MessageStorage extends Storage {
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface $channel, ?array $data = null) {
         parent::__construct($client, $data);
-        $this->channel = $channel;
+        $this->channelID = $channel->id;
         
         $time = (int) $this->client->getOption('messageCacheLifetime', 0);
         $inv = (int) $this->client->getOption('messageSweepInterval', $time);
@@ -39,7 +39,10 @@ class MessageStorage extends Storage {
     function __destruct() {
         if($this->timer) {
             $this->client->cancelTimer($this->timer);
+            $this->timer = null;
         }
+        
+        parent::__destruct();
     }
     
     /**
@@ -57,7 +60,7 @@ class MessageStorage extends Storage {
      * @return int
      */
     function sweep(int $time) {
-        if($time === 0) {
+        if($time <= 0) {
             $this->clear();
             return;
         }

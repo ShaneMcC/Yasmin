@@ -27,6 +27,7 @@ class Base implements \JsonSerializable, \Serializable {
      * @internal
      */
     function __destruct() {
+        echo 'Destructor called for '.\get_class($this).'#'.\spl_object_id($this).\PHP_EOL;
         $this->_markForDelete();
     }
     
@@ -146,6 +147,10 @@ class Base implements \JsonSerializable, \Serializable {
      */
     function _markForDelete() {
         foreach($this as $key => $val) {
+            if($val instanceof \CharlotteDunois\Yasmin\Utils\Collection) {
+                $val->clear();
+            }
+            
             $this->$key = null;
             unset($val);
         }

@@ -11,23 +11,23 @@ namespace CharlotteDunois\Yasmin\Models;
 
 /**
  * Represents a guild's category channel.
- * @property string                                    $id                     The ID of the channel.
- * @property string                                    $name                   The channel name.
- * @property string                                    $type                   The channel type ({@see \CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES}).
- * @property \CharlotteDunois\Yasmin\Models\Guild      $guild                  The guild this category channel belongs to.
- * @property int                                       $createdTimestamp       The timestamp of when this channel was created.
- * @property int                                       $position               The channel position.
- * @property \CharlotteDunois\Yasmin\Utils\Collection  $permissionOverwrites   A collection of PermissionOverwrite instances.
+ * @property string                                     $id                     The ID of the channel.
+ * @property string                                     $name                   The channel name.
+ * @property string                                     $type                   The channel type ({@see \CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES}).
+ * @property int                                        $createdTimestamp       The timestamp of when this channel was created.
+ * @property int                                        $position               The channel position.
+ * @property \CharlotteDunois\Yasmin\Utils\Collection   $permissionOverwrites   A collection of PermissionOverwrite instances.
  *
- * @property \CharlotteDunois\Yasmin\Utils\Collection  $children               Returns all channels which are childrens of this category.
- * @property \DateTime                                 $createdAt              The DateTime instance of createdTimestamp.
+ * @property \CharlotteDunois\Yasmin\Utils\Collection   $children               Returns all channels which are childrens of this category.
+ * @property \DateTime                                  $createdAt              The DateTime instance of createdTimestamp.
+ * @property \CharlotteDunois\Yasmin\Models\Guild|null  $guild                  The guild this category channel belongs to, or null.
  */
 class CategoryChannel extends ClientBase
     implements \CharlotteDunois\Yasmin\Interfaces\ChannelInterface,
                 \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface {
     use \CharlotteDunois\Yasmin\Traits\GuildChannelTrait;
     
-    protected $guild;
+    protected $guildID;
     
     protected $id;
     protected $type;
@@ -42,7 +42,7 @@ class CategoryChannel extends ClientBase
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Guild $guild, array $channel) {
         parent::__construct($client);
-        $this->guild = $guild;
+        $this->guildID = $guild->id;
         
         $this->id = $channel['id'];
         $this->type = \CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES[$channel['type']];
@@ -50,6 +50,17 @@ class CategoryChannel extends ClientBase
         $this->permissionOverwrites = new \CharlotteDunois\Yasmin\Utils\Collection();
         
         $this->_patch($channel);
+    }
+    
+    /**
+     * @internal
+     */
+    function __destruct() {
+        if($this->permissionOverwrites) {
+            $this->permissionOverwrites->clear();
+        }
+        
+        parent::__destruct();
     }
     
     /**
@@ -71,6 +82,9 @@ class CategoryChannel extends ClientBase
             break;
             case 'createdAt':
                 return \CharlotteDunois\Yasmin\Utils\DataHelpers::makeDateTime($this->createdTimestamp);
+            break;
+            case 'guild':
+                return $this->client->guilds->get($this->guildID);
             break;
         }
         

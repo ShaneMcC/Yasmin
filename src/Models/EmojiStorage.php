@@ -13,14 +13,14 @@ namespace CharlotteDunois\Yasmin\Models;
  * Emoji Storage to store emojis, utilizes Collection.
  */
 class EmojiStorage extends Storage {
-    protected $guild;
+    protected $guildID;
     
     /**
      * @internal
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, ?\CharlotteDunois\Yasmin\Models\Guild $guild = null, ?array $data = null) {
         parent::__construct($client, $data);
-        $this->guild = $guild;
+        $this->guildID = ($guild !== null ? $guild->id : null);
     }
     
     /**
@@ -76,14 +76,14 @@ class EmojiStorage extends Storage {
     /**
      * @internal
      */
-    function factory(array $data) {
+    function factory(array $data, ?\CharlotteDunois\Yasmin\Models\Guild $guild = null) {
         if($this->has($data['id'])) {
             $emoji = $this->get($data['id']);
             $emoji->_patch($data);
             return $emoji;
         }
         
-        $emoji = new \CharlotteDunois\Yasmin\Models\Emoji($this->client, $this->guild, $data);
+        $emoji = new \CharlotteDunois\Yasmin\Models\Emoji($this->client, ($guild ?? $this->guild), $data);
         $id = ($emoji->id ?? $emoji->name);
         
         $this->set($id, $emoji);

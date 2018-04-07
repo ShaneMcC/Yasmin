@@ -43,9 +43,9 @@ namespace CharlotteDunois\Yasmin\Models;
  *
  * @property \CharlotteDunois\Yasmin\Models\VoiceChannel|null               $afkChannel                   The guild's afk channel, or null.
  * @property \DateTime                                                      $createdAt                    The DateTime instance of createdTimestamp.
- * @property \CharlotteDunois\Yasmin\Models\Role                            $defaultRole                  The guild's default role.
+ * @property \CharlotteDunois\Yasmin\Models\Role|null                       $defaultRole                  The guild's default role, or null.
  * @property \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface|null  $embedChannel                 The guild's embed channel, or null.
- * @property \CharlotteDunois\Yasmin\Models\GuildMember                     $me                           The guild member of the client user.
+ * @property \CharlotteDunois\Yasmin\Models\GuildMember|null                $me                           The guild member of the client user, or null.
  * @property string                                                         $nameAcronym                  The acronym that shows up in place of a guild icon.
  * @property \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface|null  $systemChannel                The guild's system channel, or null.
  * @property bool                                                           $vanityURL                    Whether the guild has a vanity invite url.
@@ -159,6 +159,33 @@ class Guild extends ClientBase {
         if($this->available) {
             $this->_patch($guild);
         }
+    }
+    
+    /**
+     * @internal
+     */
+    function __destruct() {
+        if($this->channels) {
+            $this->channels->clear();
+        }
+        
+        if($this->emojis) {
+            $this->emojis->clear();
+        }
+        
+        if($this->members) {
+            $this->members->clear();
+        }
+        
+        if($this->presences) {
+            $this->presences->clear();
+        }
+        
+        if($this->roles) {
+            $this->roles->clear();
+        }
+        
+        parent::__destruct();
     }
     
     /**
@@ -977,7 +1004,7 @@ class Guild extends ClientBase {
      * @internal
      */
     function _addMember(array $member, bool $initial = false) {
-        $guildmember = $this->members->factory($member);
+        $guildmember = $this->members->factory($member, $this);
         
         if(!$initial) {
             $this->memberCount++;
@@ -1040,11 +1067,11 @@ class Guild extends ClientBase {
         $this->widgetChannelID = $guild['widget_channel_id'] ?? $this->widgetChannelID;
         
         foreach($guild['roles'] as $role) {
-            $this->roles->factory($role);
+            $this->roles->factory($role, $this);
         }
         
         foreach($guild['emojis'] as $emoji) {
-            $this->emojis->factory($emoji);
+            $this->emojis->factory($emoji, $this);
         }
         
         if(!empty($guild['channels'])) {
