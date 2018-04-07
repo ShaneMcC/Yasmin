@@ -989,7 +989,7 @@ class Guild extends ClientBase {
     /**
      * @internal
      */
-    function _removeMember(string $userid) {
+    function _removeMember(int $userid) {
         if($this->members->has($userid)) {
             $member = $this->members->get($userid);
             $this->members->delete($userid);
