@@ -19,6 +19,8 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property bool|null                                                                                                    $revoked             If the invite is revoked, this will indicate it, or null.
  * @property bool|null                                                                                                    $temporary           If this invite grants temporary membership, or null.
  * @property int|null                                                                                                     $uses                Number of times this invite has been used, or null.
+ * @property int|null                                                                                                     $presenceCount       Approximate amount of presences, or null.
+ * @property int|null                                                                                                     $memberCount         Approximate amount of members, or null.
  *
  * @property \DateTime|null                                                                                               $createdAt           The DateTime instance of the createdTimestamp, or null.
  * @property \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface|\CharlotteDunois\Yasmin\Models\PartialChannel|null  $channel             The channel which this invite belongs to, or null.
@@ -39,6 +41,9 @@ class Invite extends ClientBase {
     protected $temporary;
     protected $uses;
     
+    protected $presenceCount;
+    protected $memberCount;
+    
     /**
      * @internal
      */
@@ -56,6 +61,9 @@ class Invite extends ClientBase {
         $this->revoked = $invite['revoked'] ?? null;
         $this->temporary = $invite['temporary'] ?? null;
         $this->uses = $invite['uses'] ?? null;
+        
+        $this->presenceCount = (isset($invite['approximate_presence_count']) ? ((int) $invite['approximate_presence_count']) : $this->presenceCount);
+        $this->memberCount = (isset($invite['approximate_member_count']) ? ((int) $invite['approximate_member_count']) : $this->memberCount);
     }
     
     /**

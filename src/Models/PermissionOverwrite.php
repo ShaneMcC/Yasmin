@@ -74,6 +74,9 @@ class PermissionOverwrite extends ClientBase {
                 
                 return null;
             break;
+            case 'target':
+                return ($this->type === 'role' ? $this->channel->guild->roles->get($this->id) : $this->channel->guild->members->get($this->id));
+            break;
         }
         
         return parent::__get($name);
