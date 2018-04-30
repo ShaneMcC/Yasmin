@@ -26,6 +26,7 @@ class Snowflake {
     const EPOCH = 1420070400;
     
     protected static $incrementIndex = 0;
+    protected static $incrementTime = 0;
     
     protected $timestamp;
     protected $workerID;
@@ -83,7 +84,7 @@ class Snowflake {
      * Generates a new snowflake.
      * @param int  $workerID   Valid values are in the range of 0-31.
      * @param int  $processID  Valid values are in the range of 0-31.
-     * @return string
+     * @return int
      */
     static function generate(int $workerID = 1, int $processID = 0) {
         if($workerID > 31 || $workerID < 0) {
@@ -94,18 +95,34 @@ class Snowflake {
             throw new \InvalidArgumentException('Process ID is out of range');
         }
         
-        if(self::$incrementIndex >= 4095) {
+        $time = \microtime(true);
+        
+        if($time === self::$incrementTime) {
+            self::$incrementIndex++;
+            
+            if(self::$incrementIndex >= 4095) {
+                \usleep(1000);
+                
+                $time = \microtime(true);
+                self::$incrementIndex = 0;
+            }
+        } else {
             self::$incrementIndex = 0;
+            self::$incrementTime = $time;
         }
         
         $workerID = \str_pad(\decbin($workerID), 5, 0, \STR_PAD_LEFT);
         $processID = \str_pad(\decbin($processID), 5, 0, \STR_PAD_LEFT);
         
-        $mtime = \explode('.', ((string) \microtime(true)));
+        $mtime = \explode('.', ((string) $time));
+        if(\count($mtime) < 2) {
+            $mtime[1] = '000';
+        }
+        
         $time = ((string) (((int) $mtime[0]) - self::EPOCH)).\substr($mtime[1], 0, 3);
         
-        $binary = \str_pad(\decbin(((int) $time)), 42, 0, \STR_PAD_LEFT).$workerID.$processID.\str_pad(\decbin((self::$incrementIndex++)), 12, 0, \STR_PAD_LEFT);
-        return ((string) \bindec($binary));
+        $binary = \str_pad(\decbin(((int) $time)), 42, 0, \STR_PAD_LEFT).$workerID.$processID.\str_pad(\decbin(self::$incrementIndex), 12, 0, \STR_PAD_LEFT);
+        return \bindec($binary);
     }
     
     /**

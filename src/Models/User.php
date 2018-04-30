@@ -69,7 +69,6 @@ class User extends ClientBase {
     /**
      * @inheritDoc
      *
-     * @return string|int|null|\DateTime|\CharlotteDunois\Yasmin\Models\DMChannel|\CharlotteDunois\Yasmin\Models\Message|\CharlotteDunois\Yasmin\Models\Presence
      * @throws \RuntimeException
      * @internal
      */
