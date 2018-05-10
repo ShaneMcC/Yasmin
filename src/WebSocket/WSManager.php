@@ -230,6 +230,27 @@ class WSManager implements \CharlotteDunois\Events\EventEmitterInterface {
     }
     
     /**
+     * @throws \Exception
+     * @internal
+     */
+    function __isset($name) {
+        try {
+            if(\property_exists($this, $name)) {
+                return true;
+            }
+            
+            $this->$name;
+            return true;
+        } catch (\RuntimeException $e) {
+            if($e->getTrace()[0]['function'] === '__get') {
+                return false;
+            }
+            
+            throw $e;
+        }
+    }
+    
+    /**
      * @throws \RuntimeException
      */
     function __get($name) {
@@ -388,7 +409,7 @@ class WSManager implements \CharlotteDunois\Events\EventEmitterInterface {
                             if($this->previous) {
                                 $this->previous = false;
                             }
-                        } catch(\Throwable | \Exception | \Error $e) {
+                        } catch (\Throwable | \Exception | \Error $e) {
                             $this->previous = !$this->previous;
                             $this->client->emit('error', $e);
                             $this->reconnect(true);

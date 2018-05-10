@@ -68,7 +68,6 @@ class User extends ClientBase {
     /**
      * @inheritDoc
      *
-     * @return string|int|null|\DateTime|\CharlotteDunois\Yasmin\Models\DMChannel|\CharlotteDunois\Yasmin\Models\Message|\CharlotteDunois\Yasmin\Models\Presence
      * @throws \RuntimeException
      * @internal
      */
@@ -94,7 +93,7 @@ class User extends ClientBase {
             case 'lastMessage':
                 if($this->lastMessageID !== null) {
                     $channel = $this->client->channels->first(function ($channel) {
-                        return $channel->messages->has($this->lastMessageID);
+                        return ($channel->type === 'text' && $channel->messages->has($this->lastMessageID));
                     });
                     
                     if($channel) {

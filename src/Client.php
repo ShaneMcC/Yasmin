@@ -31,7 +31,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
      * The version of Yasmin.
      * @var string
      */
-    const VERSION = '0.4.1-dev';
+    const VERSION = '0.4.1';
     
     /**
      * WS connection status: Disconnected.
@@ -280,6 +280,27 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
         $this->users = new $this->options['internal.storages.users']($this);
         
         $this->registerUtils();
+    }
+    
+    /**
+     * @throws \Exception
+     * @internal
+     */
+    function __isset($name) {
+        try {
+            if(\property_exists($this, $name)) {
+                return true;
+            }
+            
+            $this->$name;
+            return true;
+        } catch (\RuntimeException $e) {
+            if($e->getTrace()[0]['function'] === '__get') {
+                return false;
+            }
+            
+            throw $e;
+        }
     }
     
     /**
@@ -661,18 +682,19 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
     
     /**
      * Obtains an invite from Discord. Resolves with an instance of Invite.
-     * @param string  $invite  The invite code or an invite URL.
+     * @param string  $invite      The invite code or an invite URL.
+     * @param bool    $withCounts  Whether the invite should contain approximate counts.
      * @return \React\Promise\ExtendedPromiseInterface
      * @see \CharlotteDunois\Yasmin\Models\Invite
      */
-    function fetchInvite(string $invite) {
-        return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($invite) {
+    function fetchInvite(string $invite, bool $withCounts = false) {
+        return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($invite, $withCounts) {
             \preg_match('/discord(?:app\.com\/invite|\.gg)\/([\w-]{2,255})/i', $invite, $matches);
             if(!empty($matches[1])) {
                 $invite = $matches[1];
             }
             
-            $this->api->endpoints->invite->getInvite($invite)->done(function ($data) use ($resolve) {
+            $this->api->endpoints->invite->getInvite($invite, $withCounts)->done(function ($data) use ($resolve) {
                 $invite = new \CharlotteDunois\Yasmin\Models\Invite($this, $data);
                 $resolve($invite);
             }, $reject);

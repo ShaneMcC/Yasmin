@@ -98,14 +98,14 @@ class DataHelpers {
      */
     static function escapeMarkdown(string $text, bool $onlyCodeBlock = false, bool $onlyInlineCode = false) {
         if($onlyCodeBlock) {
-            return \preg_replace('/```/miu', "\\`\\`\\`", $text);
+            return \preg_replace('/(```)/miu', "\\`\\`\\`", $text);
         }
         
         if($onlyInlineCode) {
-            return \preg_replace('/(`|\\\\)/miu', '\\\\$1', $text);
+            return \preg_replace('/(`)/miu', '\\\\$1', $text);
         }
         
-        return \preg_replace('/(\\*|_|`|~|\\\\)/miu', '\\\\$1', $text);
+        return \preg_replace('/(\\*|_|`|~)/miu', '\\\\$1', $text);
     }
     
     /**
@@ -336,7 +336,7 @@ class DataHelpers {
                         if(!$filter(...$args)) {
                             return;
                         }
-                    } catch(\Throwable | \Exception | \Error $e) {
+                    } catch (\Throwable | \Exception | \Error $e) {
                         $emitter->removeListener($event, $listener);
                         return $reject($e);
                     }
