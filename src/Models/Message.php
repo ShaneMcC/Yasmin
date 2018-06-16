@@ -449,7 +449,7 @@ class Message extends ClientBase {
         $this->mentions = new \CharlotteDunois\Yasmin\Models\MessageMentions($this->client, $this, $message);
         
         foreach($this->mentions->channels as $channel) {
-            $this->cleanContent = \str_replace($channel->__toString(), $channel->name, $this->cleanContent);
+            $this->cleanContent = \str_replace('<#'.$channel->id.'>', $channel->name, $this->cleanContent);
         }
         
         foreach($this->mentions->roles as $role) {
@@ -458,6 +458,12 @@ class Message extends ClientBase {
         
         foreach($this->mentions->users as $user) {
             $this->cleanContent = \str_replace($user->__toString(), ($this->channel->type === 'text' && $this->channel->guild->members->has($user->id) ? $this->channel->guild->members->get($user->id)->displayName : $user->username), $this->cleanContent);
+        }
+        
+        if(!empty($message['member']) && !$this->guild->members->has($this->author->id)) {
+            $member = $message['member'];
+            $member['user'] = $message['author'];
+            $this->guild->_addMember($member, true);
         }
     }
 }
