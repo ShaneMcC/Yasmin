@@ -409,11 +409,12 @@ class Collection implements \Countable, \Iterator {
             } elseif(\is_object($val)) {
                 $data .= $glue.$val->$col;
             } else {
+                $glue = $col;
                 $data .= $col.$val;
             }
         }
         
-        return \rtrim($data, $glue);
+        return \substr($data, \strlen($glue));
     }
     
     /**
