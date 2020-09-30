@@ -15,12 +15,15 @@ namespace CharlotteDunois\Yasmin\WebSocket\Handlers;
  */
 class Reconnect implements \CharlotteDunois\Yasmin\Interfaces\WSHandlerInterface {
     protected $wshandler;
-    
+
     function __construct(\CharlotteDunois\Yasmin\WebSocket\WSHandler $wshandler) {
         $this->wshandler = $wshandler;
     }
-    
+
     function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, $packet): void {
+        if ($packet['d'] === NULL) {
+            $packet['d'] = false;
+        }
         $ws->reconnect($packet['d']);
     }
 }
