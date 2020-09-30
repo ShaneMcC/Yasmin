@@ -1,7 +1,8 @@
 {
-    "name": "valzargaming/yasmin",
+    "name": "shanemcc/yasmin",
     "replace": {
-        "charlottedunois/yasmin": "self.version"
+        "charlottedunois/yasmin": "self.version",
+        "valzargaming/yasmin": "self.version"
     },
     "description": "Yasmin is a Discord API library for PHP.",
     "type": "library",
@@ -15,6 +16,10 @@
             "name": "Valithor Obsidion",
             "email": "valzargaming@gmail.com",
             "role": "Maintainer"
+        },
+        {
+            "name": "Shane Mc Cormack",
+            "email": "shanemcc@gmail.com"
         }
     ],
     "minimum-stability": "dev",
@@ -39,10 +44,6 @@
         "react/filesystem": "^0.1.1",
         "react/promise": "^2.7.0",
         "ringcentral/psr7": "^1.2"
-    },
-    "suggest": {
-        "charlottedunois/athena": "For Redis-backed ratelimit bucket",
-        "charlottedunois/kimberly": "For WS encoding etf 🚀"
     },
     "autoload": {
         "psr-4": {
