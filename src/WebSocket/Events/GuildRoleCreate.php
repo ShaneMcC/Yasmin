@@ -11,7 +11,7 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
 
 /**
  * WS Event
- * @see https://discordapp.com/developers/docs/topics/gateway#guild-role-create
+ * @see https://discord.com/developers/docs/topics/gateway#guild-role-create
  * @internal
  */
 class GuildRoleCreate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
@@ -27,7 +27,7 @@ class GuildRoleCreate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInter
     
     function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, $data): void {
         $guild = $this->client->guilds->get($data['guild_id']);
-        if($guild) {
+        if ($guild) {
             $role = $guild->roles->factory($data['role']);
             $this->client->queuedEmit('roleCreate', $role);
         }

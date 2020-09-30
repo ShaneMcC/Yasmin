@@ -15,6 +15,9 @@ namespace CharlotteDunois\Yasmin\Models;
 class ChannelStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\ChannelStorageInterface {
     /**
      * Channel Types.
+     *
+     * @see https://discord.com/developers/docs/resources/channel#channel-object-channel-types
+     *
      * @var array
      * @source
      */
@@ -43,15 +46,15 @@ class ChannelStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
      * @throws \InvalidArgumentException
      */
     function resolve($channel) {
-        if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\ChannelInterface) {
+        if ($channel instanceof \CharlotteDunois\Yasmin\Interfaces\ChannelInterface) {
             return $channel;
         }
         
-        if(\is_int($channel)) {
+        if (\is_int($channel)) {
             $channel = (string) $channel;
         }
         
-        if(\is_string($channel) && parent::has($channel)) {
+        if (\is_string($channel) && parent::has($channel)) {
             return parent::get($channel);
         }
         
@@ -84,7 +87,7 @@ class ChannelStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
      */
     function set($key, $value) {
         parent::set($key, $value);
-        if($this !== $this->client->channels) {
+        if ($this !== $this->client->channels) {
             $this->client->channels->set($key, $value);
         }
         
@@ -98,7 +101,7 @@ class ChannelStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
      */
     function delete($key) {
         parent::delete($key);
-        if($this !== $this->client->channels) {
+        if ($this !== $this->client->channels) {
             $this->client->channels->delete($key);
         }
         
@@ -110,8 +113,8 @@ class ChannelStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
      * @return $this
      */
     function clear() {
-        if($this !== $this->client->channels) {
-            foreach($this->data as $key => $val) {
+        if ($this !== $this->client->channels) {
+            foreach ($this->data as $key => $val) {
                 $this->client->channels->delete($key);
                 unset($val);
             }
@@ -130,22 +133,23 @@ class ChannelStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
      * @internal
      */
     function factory(array $data, ?\CharlotteDunois\Yasmin\Models\Guild $guild = null) {
-        if($guild === null) {
+        if ($guild === null) {
             $guild = (!empty($data['guild_id']) ? $this->client->guilds->get($data['guild_id']) : null);
         }
         
-        if(parent::has($data['id'])) {
+        if (parent::has($data['id'])) {
             $channel = parent::get($data['id']);
             $channel->_patch($data);
             return $channel;
         }
         
-        switch($data['type']) {
+        switch ($data['type']) {
             default:
                 throw new \CharlotteDunois\Yasmin\DiscordException('Unknown channel type');
             break;
             case 0:
-                if($guild === null) {
+            case 5:
+                if ($guild === null) {
                     throw new \CharlotteDunois\Yasmin\DiscordException('Unknown guild for guild channel');
                 }
                 
@@ -155,7 +159,7 @@ class ChannelStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
                 $channel = new \CharlotteDunois\Yasmin\Models\DMChannel($this->client, $data);
             break;
             case 2:
-                if($guild === null) {
+                if ($guild === null) {
                     throw new \CharlotteDunois\Yasmin\DiscordException('Unknown guild for guild channel');
                 }
                 
@@ -165,14 +169,21 @@ class ChannelStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
                 $channel = new \CharlotteDunois\Yasmin\Models\GroupDMChannel($this->client, $data);
             break;
             case 4:
-                if($guild === null) {
+                if ($guild === null) {
                     throw new \CharlotteDunois\Yasmin\DiscordException('Unknown guild for guild channel');
                 }
                 
                 $channel = new \CharlotteDunois\Yasmin\Models\CategoryChannel($this->client, $guild, $data);
             break;
+            case 5:
+                if ($guild === null) {
+                    throw new \CharlotteDunois\Yasmin\DiscordException('Unknown guild for guild channel');
+                }
+
+                $channel = new \CharlotteDunois\Yasmin\Models\NewsChannel($this->client, $guild, $data);
+            break;
             case 6:
-                if($guild === null) {
+                if ($guild === null) {
                     throw new \CharlotteDunois\Yasmin\DiscordException('Unknown guild for guild channel');
                 }
                 
@@ -182,7 +193,7 @@ class ChannelStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
         
         $this->set($channel->id, $channel);
         
-        if($guild) {
+        if ($guild) {
             $guild->channels->set($channel->id, $channel);
         }
         
@@ -195,17 +206,17 @@ class ChannelStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
      * @return int
      */
     static function getTypeForChannel(\CharlotteDunois\Yasmin\Interfaces\ChannelInterface $channel) {
-        if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\GroupDMChannelInterface) {
+        if ($channel instanceof \CharlotteDunois\Yasmin\Interfaces\GroupDMChannelInterface) {
             return self::CHANNEL_TYPES['group'];
-        } elseif($channel instanceof \CharlotteDunois\Yasmin\Interfaces\DMChannelInterface) {
+        } elseif ($channel instanceof \CharlotteDunois\Yasmin\Interfaces\DMChannelInterface) {
             return self::CHANNEL_TYPES['dm'];
-        } elseif($channel instanceof \CharlotteDunois\Yasmin\Interfaces\GuildVoiceChannelInterface) {
+        } elseif ($channel instanceof \CharlotteDunois\Yasmin\Interfaces\GuildVoiceChannelInterface) {
             return self::CHANNEL_TYPES['voice'];
-        } elseif($channel instanceof \CharlotteDunois\Yasmin\Interfaces\CategoryChannelInterface) {
+        } elseif ($channel instanceof \CharlotteDunois\Yasmin\Interfaces\CategoryChannelInterface) {
             return self::CHANNEL_TYPES['category'];
-        } elseif($channel instanceof \CharlotteDunois\Yasmin\Interfaces\GuildNewsChannelInterface) {
+        } elseif ($channel instanceof \CharlotteDunois\Yasmin\Interfaces\GuildNewsChannelInterface) {
             return self::CHANNEL_TYPES['news'];
-        } elseif($channel instanceof \CharlotteDunois\Yasmin\Interfaces\GuildStoreChannelInterface) {
+        } elseif ($channel instanceof \CharlotteDunois\Yasmin\Interfaces\GuildStoreChannelInterface) {
             return self::CHANNEL_TYPES['store'];
         }
         

@@ -11,7 +11,7 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
 
 /**
  * WS Event
- * @see https://discordapp.com/developers/docs/topics/gateway#channel-create
+ * @see https://discord.com/developers/docs/topics/gateway#channel-create
  * @internal
  */
 class ChannelCreate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
@@ -29,19 +29,19 @@ class ChannelCreate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterfa
         $channel = $this->client->channels->factory($data);
         
         $prom = array();
-        if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface) {
-            foreach($channel->getPermissionOverwrites() as $overwrite) {
-                if($overwrite->type === 'member' && $overwrite->target === null) {
-                    $prom[] = $channel->getGuild()->fetchMember($overwrite->id)->then(function (\CharlotteDunois\Yasmin\Models\GuildMember $member) use ($overwrite) {
+        if ($channel instanceof \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface) {
+            foreach ($channel->getPermissionOverwrites() as $overwrite) {
+                if ($overwrite->type === 'member' && $overwrite->target === null) {
+                    $prom[] = $channel->getGuild()->fetchMember($overwrite->id)->then(function(\CharlotteDunois\Yasmin\Models\GuildMember $member) use ($overwrite) {
                         $overwrite->_patch(array('target' => $member));
-                    }, function () {
+                    }, function() {
                         // Do nothing
                     });
                 }
             }
         }
         
-        \React\Promise\all($prom)->done(function () use ($channel) {
+        \React\Promise\all($prom)->done(function() use ($channel) {
             $this->client->queuedEmit('channelCreate', $channel);
         }, array($this->client, 'handlePromiseRejection'));
     }

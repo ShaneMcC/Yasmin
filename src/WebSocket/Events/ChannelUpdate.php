@@ -11,7 +11,7 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
 
 /**
  * WS Event
- * @see https://discordapp.com/developers/docs/topics/gateway#channel-update
+ * @see https://discord.com/developers/docs/topics/gateway#channel-update
  * @internal
  */
 class ChannelUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
@@ -36,28 +36,28 @@ class ChannelUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterfa
     
     function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, $data): void {
         $channel = $this->client->channels->get($data['id']);
-        if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\ChannelInterface) {
+        if ($channel instanceof \CharlotteDunois\Yasmin\Interfaces\ChannelInterface) {
             $oldChannel = null;
-            if($this->clones) {
+            if ($this->clones) {
                 $oldChannel = clone $channel;
             }
             
             $channel->_patch($data);
             
             $prom = array();
-            if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface) {
-                foreach($channel->getPermissionOverwrites() as $overwrite) {
-                    if($overwrite->type === 'member' && $overwrite->target === null) {
-                        $prom[] = $channel->getGuild()->fetchMember($overwrite->id)->then(function (\CharlotteDunois\Yasmin\Models\GuildMember $member) use ($overwrite) {
+            if ($channel instanceof \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface) {
+                foreach ($channel->getPermissionOverwrites() as $overwrite) {
+                    if ($overwrite->type === 'member' && $overwrite->target === null) {
+                        $prom[] = $channel->getGuild()->fetchMember($overwrite->id)->then(function(\CharlotteDunois\Yasmin\Models\GuildMember $member) use ($overwrite) {
                             $overwrite->_patch(array('target' => $member));
-                        }, function () {
+                        }, function() {
                             // Do nothing
                         });
                     }
                 }
             }
             
-            \React\Promise\all($prom)->done(function () use ($channel, $oldChannel) {
+            \React\Promise\all($prom)->done(function() use ($channel, $oldChannel) {
                 $this->client->queuedEmit('channelUpdate', $channel, $oldChannel);
             }, array($this->client, 'handlePromiseRejection'));
         }

@@ -11,7 +11,7 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
 
 /**
  * WS Event
- * @see https://discordapp.com/developers/docs/topics/gateway#guild-update
+ * @see https://discord.com/developers/docs/topics/gateway#guild-update
  * @internal
  */
 class GuildUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
@@ -36,15 +36,15 @@ class GuildUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface
     
     function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, $data): void {
         $guild = $this->client->guilds->get($data['id']);
-        if($guild) {
-            if(($data['unavailable'] ?? false)) {
+        if ($guild) {
+            if (($data['unavailable'] ?? false)) {
                 $guild->_patch(array('unavailable' => true));
                 $this->client->queuedEmit('guildUnavailable', $guild);
                 return;
             }
             
             $oldGuild = null;
-            if($this->clones) {
+            if ($this->clones) {
                 $oldGuild = clone $guild;
             }
             

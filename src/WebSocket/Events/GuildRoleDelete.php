@@ -11,7 +11,7 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
 
 /**
  * WS Event
- * @see https://discordapp.com/developers/docs/topics/gateway#guild-role-delete
+ * @see https://discord.com/developers/docs/topics/gateway#guild-role-delete
  * @internal
  */
 class GuildRoleDelete implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
@@ -27,9 +27,9 @@ class GuildRoleDelete implements \CharlotteDunois\Yasmin\Interfaces\WSEventInter
     
     function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, $data): void {
         $guild = $this->client->guilds->get($data['guild_id']);
-        if($guild) {
+        if ($guild) {
             $role = $guild->roles->get($data['role_id']);
-            if($role) {
+            if ($role) {
                 $guild->roles->delete($role->id);
                 $this->client->queuedEmit('roleDelete', $role);
             }

@@ -11,7 +11,7 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
 
 /**
  * WS Event
- * @see https://discordapp.com/developers/docs/topics/gateway#channel-delete
+ * @see https://discord.com/developers/docs/topics/gateway#channel-delete
  * @internal
  */
 class ChannelDelete implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
@@ -27,8 +27,8 @@ class ChannelDelete implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterfa
     
     function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, $data): void {
         $channel = $this->client->channels->get($data['id']);
-        if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\ChannelInterface) {
-            if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface) {
+        if ($channel instanceof \CharlotteDunois\Yasmin\Interfaces\ChannelInterface) {
+            if ($channel instanceof \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface) {
                 $channel->getGuild()->channels->delete($channel->getId());
             }
             
