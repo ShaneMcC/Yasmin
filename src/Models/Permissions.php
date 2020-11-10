@@ -21,9 +21,10 @@ class Permissions extends Base {
      * @source
      */
     const ALL = 2146958847;
-    
+
     /**
      * Available Permissions in Discord.
+     * See: https://discord.com/developers/docs/topics/permissions
      * @var array
      * @source
      */
@@ -37,7 +38,7 @@ class Permissions extends Base {
         'ADD_REACTIONS' => (1 << 6),
         'VIEW_AUDIT_LOG' => (1 << 7),
         'PRIORITY_SPEAKER' => (1 << 8),
-
+        'STREAM' => (1 << 9),
         'VIEW_CHANNEL' => (1 << 10),
         'SEND_MESSAGES' => (1 << 11),
         'SEND_TTS_MESSAGES' => (1 << 12),
@@ -47,33 +48,32 @@ class Permissions extends Base {
         'READ_MESSAGE_HISTORY' => (1 << 16),
         'MENTION_EVERYONE' => (1 << 17),
         'USE_EXTERNAL_EMOJIS' => (1 << 18),
-
+        'VIEW_GUILD_INSIGHTS' => (1 << 19),
         'CONNECT' => (1 << 20),
         'SPEAK' => (1 << 21),
         'MUTE_MEMBERS' => (1 << 22),
         'DEAFEN_MEMBERS' => (1 << 23),
         'MOVE_MEMBERS' => (1 << 24),
         'USE_VAD' => (1 << 25),
-
         'CHANGE_NICKNAME' => (1 << 26),
         'MANAGE_NICKNAMES' => (1 << 27),
         'MANAGE_ROLES' => (1 << 28),
         'MANAGE_WEBHOOKS' => (1 << 29),
         'MANAGE_EMOJIS' => (1 << 30)
     );
-    
+
     /**
      * The bitfield to remove from channel overwrites to prevent wrong calculated final permissions, as they do nothing.
      * @var int
      */
     const CHANNEL_UNACCESSIBLE_PERMISSIONS = (1 << 3);
-    
+
     /**
      * The bitfield value.
      * @var int
      */
     protected $bitfield;
-    
+
     /**
      * Constructs a new instance.
      * @param int  $permission
@@ -81,7 +81,7 @@ class Permissions extends Base {
     function __construct(int $permission = 0) {
         $this->bitfield = $permission;
     }
-    
+
     /**
      * {@inheritdoc}
      * @return mixed
@@ -92,10 +92,10 @@ class Permissions extends Base {
         if (\property_exists($this, $name)) {
             return $this->$name;
         }
-        
+
         return parent::__get($name);
     }
-    
+
     /**
      * @return mixed
      * @internal
@@ -103,7 +103,7 @@ class Permissions extends Base {
     function jsonSerialize() {
         return $this->bitfield;
     }
-    
+
     /**
      * Checks if a given permission is granted.
      * @param array|int|string  $permissions
@@ -115,21 +115,21 @@ class Permissions extends Base {
         if (!\is_array($permissions)) {
             $permissions = array($permissions);
         }
-        
+
         if ($checkAdmin && ($this->bitfield & self::PERMISSIONS['ADMINISTRATOR']) > 0) {
             return true;
         }
-        
+
         foreach ($permissions as $perm) {
             $perm = self::resolve($perm);
             if (($this->bitfield & $perm) !== $perm) {
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * Checks if a given permission is missing.
      * @param array|int|string  $permissions
@@ -140,7 +140,7 @@ class Permissions extends Base {
     function missing($permissions, bool $checkAdmin = true) {
         return !$this->has($permissions, $checkAdmin);
     }
-    
+
     /**
      * Adds permissions to these ones.
      * @param int|string  ...$permissions
@@ -153,11 +153,11 @@ class Permissions extends Base {
             $perm = self::resolve($perm);
             $total |= $perm;
         }
-        
+
         $this->bitfield |= $total;
         return $this;
     }
-    
+
     /**
      * Removes permissions from these ones.
      * @param int|string  ...$permissions
@@ -170,11 +170,11 @@ class Permissions extends Base {
             $perm = self::resolve($perm);
             $total |= $perm;
         }
-        
+
         $this->bitfield &= ~$total;
         return $this;
     }
-    
+
     /**
      * Resolves a permission name to number.
      * @param int|string  $permission
@@ -187,10 +187,10 @@ class Permissions extends Base {
         } elseif (\is_string($permission) && isset(self::PERMISSIONS[$permission])) {
             return self::PERMISSIONS[$permission];
         }
-        
+
         throw new \InvalidArgumentException('Unable to resolve unknown permission');
     }
-    
+
     /**
      * Resolves a permission number to the name. Also checks if a given name is a valid permission.
      * @param int|string  $permission
@@ -206,7 +206,7 @@ class Permissions extends Base {
         } elseif (\is_string($permission) && isset(self::PERMISSIONS[$permission])) {
             return $permission;
         }
-        
+
         throw new \InvalidArgumentException('Unable to resolve unknown permission');
     }
 }
