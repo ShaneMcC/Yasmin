@@ -145,7 +145,9 @@ class RatelimitBucket implements \CharlotteDunois\Yasmin\Interfaces\RatelimitBuc
      */
     function unshift(\CharlotteDunois\Yasmin\HTTP\APIRequest $request) {
         \array_unshift($this->queue, $request);
-        $this->remaining++;
+        // TODO: I don't think this should be here.
+        // https://github.com/valzargaming/Yasmin/issues/7
+        // $this->remaining++;
         return $this;
     }
     
