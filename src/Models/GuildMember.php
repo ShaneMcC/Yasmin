@@ -236,13 +236,13 @@ class GuildMember extends ClientBase {
                     $val = $val->all();
                 }
                 
-                return \array_unique(\array_map(function($role) {
+                return \array_values(\array_unique(\array_map(function($role) {
                     if ($role instanceof \CharlotteDunois\Yasmin\Models\Role) {
                         return $role->id;
                     }
                     
                     return $role;
-                }, $val));
+                }, $val)));
             }),
             'deaf' => array('type' => 'bool'),
             'mute' => array('type' => 'bool'),
